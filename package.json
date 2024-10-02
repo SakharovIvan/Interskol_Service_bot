@@ -1,22 +1,26 @@
 {
   "name": "interskol_service_bot",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "bin/index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon bin/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon bin/index.js"
   },
-  "author": "",
+  "author": "Ivan Sakharov",
   "license": "ISC",
   "dependencies": {
+    "@sequelize/postgres": "^7.0.0-alpha.42",
     "file-system": "^1.2.2",
-    "node-telegram-bot-api": "^0.63.0",
+    "node-telegram-bot-api": "^0.66.0",
     "nodemon": "^3.1.7",
+    "path": "^0.12.7",
     "pg": "^8.13.0",
     "sequelize": "^6.37.3",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "xlsx": "^0.18.5"
   },
-  "devDependencies": {},
+  "bin": {
+    "interskol_service_bot": "bin/index.js"
+  },
   "description": ""
 }
