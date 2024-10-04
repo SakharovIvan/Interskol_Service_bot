@@ -17,9 +17,10 @@ const updateToolByCode = async (code, data, commit = false) => {
           text: `Need commit, update ${code}?`,
           option: botoptions.needcommitToolChanges,
         };
+      } else {
+        ToolPaths.create(data);
+        return { text: `${code} created`, option: botoptions.defaultoption };
       }
-      ToolPaths.create(data);
-      return { text: `${code} created`, option: botoptions.defaultoption };
     })
     .catch(() => {
       return {
@@ -31,17 +32,32 @@ const updateToolByCode = async (code, data, commit = false) => {
 };
 
 const updateToolSPmatNo = async (code, data) => {
-  ToolSPmatNo.destroy({ where: { tool_code: code } })
+  const newdata = data.map(({ spmatNo, sppiccode, spqty }) => {
+    return {
+      tool_code: code,
+      spmatNo,
+      sppiccode,
+      spqty,
+    };
+  });
+  const answer = ToolSPmatNo.destroy({ where: { tool_code: code } })
     .then(() => {
-      ToolSPmatNo.create(data);
-      return { text: `${code} created`, option: botoptions.defaultoption };
+      ToolSPmatNo.bulkCreate(newdata).then(() => {
+        return { text: `${code} updated`, option: botoptions.defaultoption };
+      });
+    })
+    .catch(() => {
+      ToolSPmatNo.bulkCreate(newdata).then(() => {
+        return { text: `${code} created`, option: botoptions.defaultoption };
+      });
     })
     .catch(() => {
       return {
-        text: `some problem with updateToolByCode`,
+        text: `some problem with updateToolSPmatNo`,
         option: botoptions.defaultoption,
       };
     });
+  return answer;
 };
 
 export { updateToolByCode, updateToolSPmatNo };

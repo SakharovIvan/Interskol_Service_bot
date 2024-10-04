@@ -2,7 +2,7 @@ import TelegramAPI from "node-telegram-bot-api";
 import { token } from "../src/config.js";
 const bot = new TelegramAPI(token, { polling: true });
 import answers from "../public/answers.js";
-import {createAnswer,createAnswerForCallback} from "../src/index.js";
+import { createAnswer, createAnswerForCallback } from "../src/index.js";
 
 const msgoption = {
   parse_mode: "Markdown",
@@ -48,9 +48,9 @@ const start = async () => {
   });
 
   bot.on("callback_query", async (msg) => {
-       const cliId = msg.from.id;
-       const text = msg.data;
-       const chatId = msg.message.chat.id;
+    const cliId = msg.from.id;
+    const text = msg.data;
+    const chatId = msg.message.chat.id;
     //   const username = msg.from.username;
     //   const time = msg.date;
     //   let thumbPath;
@@ -62,10 +62,9 @@ const start = async () => {
       await bot.sendMessage(chatId, answer.text, answer.option);
       return;
     } catch (error) {
-      await bot.sendMessage(chatId, 'problem with callback_query', msgoption);
-      return
+      await bot.sendMessage(chatId, "problem with callback_query", msgoption);
+      return;
     }
-
   });
 };
 

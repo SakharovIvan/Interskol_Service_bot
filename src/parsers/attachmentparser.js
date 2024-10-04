@@ -15,14 +15,24 @@ const fileparser = async (file) => {
         data: { tool_code: Number(toolcode), tool_path: file },
       };
     case filetype === "xlsx":
-      fs.readFile(file, (err, data) => {
-        if (err) console.log(err);
-        const toolcode = toolcode_from_filename(file);
-        return {
-          data: { tool_code: Number(toolcode), tool_path: file },
-          exceldata: data,
-        };
-      });
+      const filexlsx = reader.readFile(path.join(__filename, file));
+      let data = [];
+      const sheets = filexlsx.SheetNames;
+      for (let i = 0; i < sheets.length; i++) {
+        const temp = reader.utils.sheet_to_json(
+          filexlsx.Sheets[filexlsx.SheetNames[i]]
+        );
+        temp.forEach((res) => {
+          //  const tool_code = res["Артикул"];
+          const spmatNo = res["Артикул"];
+          const sppiccode = res["№ на схеме"];
+          const spqty = res["Кол-во шт./изд."];
+          const name = res["Наименование детали"];
+          const char = res["Характеристика"];
+          data.push({ spmatNo, sppiccode, spqty, name, char });
+        });
+      }
+      return { exceldata: data };
   }
 };
 

@@ -7,7 +7,7 @@ import {
 } from "./utils/downloadfilefrombot.js";
 import messageType from "./utils/messagetype.js";
 import { adminID } from "./config.js";
-import { updateToolByCode } from "./sqldata/updatedata.js";
+import { updateToolByCode, updateToolSPmatNo } from "./sqldata/updatedata.js";
 import botoptions from "./botoptions.js";
 import fileparser from "./parsers/attachmentparser.js";
 import path from "path";
@@ -26,9 +26,23 @@ const createAnswer = async (text, cliId, doc, link = "") => {
       break;
     case type === "docfile":
       const download = await downloadfile(link, doc.file_name);
+      //console.log(download);
       const filepars = await fileparser(download);
-      answer = await updateToolByCode(filepars.tool, filepars.data);
-      cliStatus[cliId] = filepars;
+      cliStatus[cliId] = { ...filepars, ...cliStatus[cliId] };
+      console.log(cliStatus[cliId]);
+      if (cliStatus[cliId].exceldata) {
+        console.log("excel checked");
+        console.log(cliStatus[cliId].exceldata);
+        answer = await updateToolSPmatNo(
+          cliStatus[cliId].data.tool_code,
+          cliStatus[cliId].exceldata
+        );
+        //answer = await updateToolSPmatNo(filepars.tool, filepars.data);
+      } else {
+        answer = await updateToolByCode(filepars.tool, filepars.data);
+      }
+
+      // console.log(cliStatus);
       break;
     default:
       answer = {

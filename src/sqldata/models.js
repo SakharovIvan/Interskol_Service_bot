@@ -42,7 +42,7 @@ ToolSPmatNo.init(
       type: DataTypes.STRING,
     },
     sppiccode: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
     spqty: {
       type: DataTypes.INTEGER,
@@ -110,6 +110,8 @@ SPanalog.init(
 
 //try {
 //  await ToolPaths.sync();
+//  await ToolSPmatNo.sync();
+//  await SPmatNo.sync();
 //  console.log("Соединение с БД было успешно установлено");
 //} catch (e) {
 //  console.log("Невозможно выполнить подключение к БД: ", e);
