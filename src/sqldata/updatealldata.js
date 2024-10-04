@@ -3,8 +3,9 @@ import XLSX from "xlsx";
 import reader from 'xlsx'
 import path from 'path'
 
-const updateToolByCode_All =async(data)=>{
 
+const updateToolPaths_All =async(data)=>{
+await ToolPaths.bulkCreate(data)
 }
 
 const updateToolSPmatNo_All =async(data)=>{

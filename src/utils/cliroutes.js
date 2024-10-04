@@ -1,3 +1,4 @@
 export default {
-    start: '/start'
+    uploadtool: '/tool',
+    uploadspfortool:'/tool/sp',
 }
