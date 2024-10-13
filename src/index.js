@@ -1,5 +1,5 @@
 import cliroutes from "./utils/cliroutes.js";
-import { getToolPathInfo } from "./sqldata/getdata.js";
+import { getInfofromBd } from "./sqldata/getdata.js";
 import {
   downloadfile,
   movefiletomaindir,
@@ -7,7 +7,7 @@ import {
 } from "./utils/downloadfilefrombot.js";
 import messageType from "./utils/messagetype.js";
 import { adminID } from "./config.js";
-import { updateToolByCode, updateToolSPmatNo } from "./sqldata/updatedata.js";
+import { updateToolByCode, updateToolSPmatNo,updatewarehouse,updateanalog} from "./sqldata/updatedata.js";
 import botoptions from "./botoptions.js";
 import fileparser from "./parsers/attachmentparser.js";
 import path from "path";
@@ -19,37 +19,51 @@ const createAnswer = async (text, cliId, doc, link = "") => {
   let answer;
   switch (true) {
     case type === "question":
-      answer = {
-        text: await getToolPathInfo(Number(text)),
-        option: botoptions.defaultoption,
-      };
+      answer = await getInfofromBd(text)
       break;
-    case type === "docfile":
+    case type === "docfile"&& adminID.includes(cliId):
       const download = await downloadfile(link, doc.file_name);
-      //console.log(download);
       const filepars = await fileparser(download);
-      cliStatus[cliId] = { ...filepars, ...cliStatus[cliId] };
-      console.log(cliStatus[cliId]);
-      if (cliStatus[cliId].exceldata) {
-        console.log("excel checked");
-        console.log(cliStatus[cliId].exceldata);
-        answer = await updateToolSPmatNo(
-          cliStatus[cliId].data.tool_code,
-          cliStatus[cliId].exceldata
-        );
-        //answer = await updateToolSPmatNo(filepars.tool, filepars.data);
-      } else {
-        answer = await updateToolByCode(filepars.tool, filepars.data);
-      }
-
-      // console.log(cliStatus);
-      break;
+      cliStatus[cliId] = {  ...cliStatus[cliId],...filepars };      
+      switch(cliStatus[cliId].filetype){
+        case 'toolpdf':
+          answer = await updateToolByCode(filepars.tool, filepars.data);
+          if (answer.text===`${filepars.tool} created`|| answer.text===`${filepars.tool} updated`){
+            console.log('movefiletomaindir check')
+            await movefiletomaindir(filepars.data.tool_path, "/public/toolPDF");}
+          break;
+        case 'toolsp':
+          try {
+            answer = await updateToolSPmatNo(
+              cliStatus[cliId].data.tool_code,
+              cliStatus[cliId].exceldata
+            );
+            await deletefilefromTemp(cliStatus[cliId].filepath);
+          } catch (error) {
+            console.log(error)
+            answer =  {
+              text: `Some problem with file toolsp update\n${error.name}`,
+              option: botoptions.defaultoption,
+            };
+          }
+        break;
+        case 'warehousestatus':
+            answer = await updatewarehouse(cliStatus[cliId].exceldata)
+            await deletefilefromTemp(cliStatus[cliId].filepath);
+            break;
+        case 'analog':
+           answer = await updateanalog(cliStatus[cliId].exceldata)
+           await deletefilefromTemp(cliStatus[cliId].filepath);
+          break;
+         }
+    break;
     default:
       answer = {
         text: "dont understand you",
         option: botoptions.defaultoption,
       };
   }
+  console.log(JSON.stringify(answer))
   return answer;
 };
 
@@ -60,12 +74,8 @@ const createAnswerForCallback = async (text, cliId) => {
     switch (true) {
       case text === "commitToolChanges-true":
         const { tool, data } = status;
-        await updateToolByCode(tool, data, true);
+        answer = await updateToolByCode(tool, data, true);
         await movefiletomaindir(data.tool_path, "/public/toolPDF");
-        answer = {
-          text: `Import excel for tool ${tool}`,
-          option: botoptions.defaultoption,
-        };
         return answer;
       case text === "commitToolChanges-false":
         answer = {
@@ -74,6 +84,11 @@ const createAnswerForCallback = async (text, cliId) => {
         };
         await deletefilefromTemp(status.data.tool_path);
         return answer;
+        default:
+          console.log(text)
+          const cbtext =text.split('%')
+          answer = await getInfofromBd(cbtext[0],Number(cbtext[1])||0)
+
     }
   } catch (error) {
     console.log(error);
@@ -82,7 +97,7 @@ const createAnswerForCallback = async (text, cliId) => {
       option: botoptions.defaultoption,
     };
   }
-
+  console.log(answer)
   return answer;
 };
 

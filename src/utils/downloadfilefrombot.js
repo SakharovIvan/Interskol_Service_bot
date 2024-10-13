@@ -12,8 +12,9 @@ const downloadfile = async (link, name, dir = "/public/temp/") => {
   return dir + name;
 };
 
-const movefiletomaindir = async (filePath, newfilePath) => {
+const movefiletomaindir = async (filePath, newfilePath, deletemode = false) => {
   try {
+    console.log(filePath, newfilePath)
     const name = path.basename(filePath);
     fs.copyFile(
       path.join(__filename, filePath),
@@ -23,13 +24,13 @@ const movefiletomaindir = async (filePath, newfilePath) => {
           console.log(err);
         }
         console.log("File copied successfully");
-
+        if (deletemode){
         fs.rm(path.join(__filename, filePath), (err) => {
           if (err) {
             console.log(err);
           }
           console.log("File deleted successfully");
-        });
+        });}
       }
     );
   } catch (error) {

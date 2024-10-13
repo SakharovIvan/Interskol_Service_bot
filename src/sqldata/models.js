@@ -20,6 +20,10 @@ ToolPaths.init(
     tool_path: {
       type: DataTypes.STRING,
     },
+    tool_name: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
   },
   {
     sequelize,
@@ -72,7 +76,7 @@ SPmatNo.init(
       type: DataTypes.STRING,
     },
     price: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL,
     },
     warehousestatus: {
       type: DataTypes.STRING,
@@ -108,13 +112,6 @@ SPanalog.init(
   }
 );
 
-//try {
-//  await ToolPaths.sync();
-//  await ToolSPmatNo.sync();
-//  await SPmatNo.sync();
-//  console.log("Соединение с БД было успешно установлено");
-//} catch (e) {
-//  console.log("Невозможно выполнить подключение к БД: ", e);
-//}
+
 
 export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog };
