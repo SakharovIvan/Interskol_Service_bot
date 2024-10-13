@@ -112,6 +112,4 @@ SPanalog.init(
   }
 );
 
-
-
 export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog };

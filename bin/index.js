@@ -1,6 +1,6 @@
 import TelegramAPI from "node-telegram-bot-api";
 import { token } from "../src/config.js";
-const bot = new TelegramAPI(token, { polling:true});
+const bot = new TelegramAPI(token, { polling: true });
 import answers from "../public/answers.js";
 import { createAnswer, createAnswerForCallback } from "../src/index.js";
 import path from "path";
@@ -39,29 +39,39 @@ const start = async () => {
             thumbPath = await bot.getFileLink(msg.document.file_id);
           }
           const answer = await createAnswer(text, cliId, doc, thumbPath);
-          console.log(answer)
-          try{
-            console.log(answer)   
-            if(Array.isArray(answer)){
-             const prom =  answer.map(async(el)=>{
-              if(el.option.parse_mode){
-                await bot.sendMessage(chatId,el.text,el.option)
-              }else{
-                if(el.option.length===0){return}
-                await bot.sendMessage(chatId,el.text,{
-                  reply_markup: {
-                    inline_keyboard:el.option}}
-                  )}
-              })
-              Promise.all(prom)
-            }else{
-            await bot.sendMessage(chatId, answer.text.tool_name, answer.option);
-            if(answer.text.tool_path){
-            await bot.sendDocument(
-              chatId,
-              path.join(process.cwd(), answer.text.tool_path)
-            )}}
-        }catch{
+          console.log(answer);
+          try {
+            console.log(answer);
+            if (Array.isArray(answer)) {
+              const prom = answer.map(async (el) => {
+                if (el.option.parse_mode) {
+                  await bot.sendMessage(chatId, el.text, el.option);
+                } else {
+                  if (el.option.length === 0) {
+                    return;
+                  }
+                  await bot.sendMessage(chatId, el.text, {
+                    reply_markup: {
+                      inline_keyboard: el.option,
+                    },
+                  });
+                }
+              });
+              Promise.all(prom);
+            } else {
+              await bot.sendMessage(
+                chatId,
+                answer.text.tool_name,
+                answer.option
+              );
+              if (answer.text.tool_path) {
+                await bot.sendDocument(
+                  chatId,
+                  path.join(process.cwd(), answer.text.tool_path)
+                );
+              }
+            }
+          } catch {
             await bot.sendMessage(chatId, answer.text, answer.option);
           }
           break;
@@ -77,27 +87,37 @@ const start = async () => {
     const chatId = msg.message.chat.id;
     try {
       const answer = await createAnswerForCallback(text, cliId);
-      console.log(answer)
-      if(Array.isArray(answer)){      
-        const prom =  answer.map(async(el)=>{
-          if(el.option.parse_mode){
-            await bot.sendMessage(chatId,el.text,el.option)
-          }else{
-            if(el.option.length===0){return}
-            await bot.sendMessage(chatId,el.text,{
+      console.log(answer);
+      if (Array.isArray(answer)) {
+        const prom = answer.map(async (el) => {
+          if (el.option.parse_mode) {
+            await bot.sendMessage(chatId, el.text, el.option);
+          } else {
+            if (el.option.length === 0) {
+              return;
+            }
+            await bot.sendMessage(chatId, el.text, {
               reply_markup: {
-                inline_keyboard:el.option}}
-              )}
-          })
-          Promise.all(prom)
-          Promise.all(prom)
-       }else{
-       await bot.sendMessage(chatId, answer.text.tool_name||answer.text, answer.option);
-       if(answer.text.tool_path){
-       await bot.sendDocument(
-         chatId,
-         path.join(process.cwd(),answer.text.tool_path)
-       )}}
+                inline_keyboard: el.option,
+              },
+            });
+          }
+        });
+        Promise.all(prom);
+        Promise.all(prom);
+      } else {
+        await bot.sendMessage(
+          chatId,
+          answer.text.tool_name || answer.text,
+          answer.option
+        );
+        if (answer.text.tool_path) {
+          await bot.sendDocument(
+            chatId,
+            path.join(process.cwd(), answer.text.tool_path)
+          );
+        }
+      }
     } catch (error) {
       await bot.sendMessage(chatId, "problem with callback_query", msgoption);
       return;

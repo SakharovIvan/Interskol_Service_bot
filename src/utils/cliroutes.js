@@ -1,4 +1,4 @@
 export default {
-    uploadtool: '/tool',
-    uploadspfortool:'/tool/sp',
-}
+  uploadtool: "/tool",
+  uploadspfortool: "/tool/sp",
+};
