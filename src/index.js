@@ -21,7 +21,7 @@ let cliStatus = {};
 
 const createAnswer = async (text, cliId, doc, link = "") => {
   const type = messageType(doc);
-  let answer;
+  var answer;
   switch (true) {
     case type === "question":
       answer = await getInfofromBd(text);
@@ -37,8 +37,7 @@ const createAnswer = async (text, cliId, doc, link = "") => {
             answer.text === `${filepars.tool} created` ||
             answer.text === `${filepars.tool} updated`
           ) {
-            console.log("movefiletomaindir check");
-            await movefiletomaindir(filepars.data.tool_path, "/public/toolPDF");
+             await movefiletomaindir(filepars.data.tool_path, "/public/toolPDF");
           }
           break;
         case "toolsp":
@@ -72,7 +71,6 @@ const createAnswer = async (text, cliId, doc, link = "") => {
         option: botoptions.defaultoption,
       };
   }
-  console.log(JSON.stringify(answer));
   return answer;
 };
 
@@ -94,7 +92,7 @@ const createAnswerForCallback = async (text, cliId) => {
         await deletefilefromTemp(status.data.tool_path);
         return answer;
       default:
-        console.log(text);
+
         const cbtext = text.split("%");
         answer = await getInfofromBd(cbtext[0], Number(cbtext[1]) || 0);
     }

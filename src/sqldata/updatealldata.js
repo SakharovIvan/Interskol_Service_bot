@@ -1,7 +1,7 @@
 import { ToolPaths, ToolSPmatNo, SPmatNo } from "./models.js";
-import XLSX from "xlsx";
 import reader from "xlsx";
 import path from "path";
+import { error } from "console";
 const __filename = process.cwd();
 
 const xlsxpars = async (file) => {
@@ -23,9 +23,11 @@ const xlsxpars = async (file) => {
       const warehousestatus = res["Комментарий по складу Запчасти"];
       const price = res["Оптовые ДСО с НДС"];
       const tool_path = res["Путь"];
-      const tool_name = res["Код инструмента"];
+      const tool_code = res["Код инструмента"];
+      const tool_name = res["Наименование инструмента"];
       data.push({
         tool_name,
+        tool_code,
         tool_path,
         spmatNo,
         sppiccode,
@@ -42,14 +44,25 @@ const xlsxpars = async (file) => {
   return data;
 };
 
-const updateToolPaths_All = async (data) => {
-  await ToolPaths.bulkCreate(data);
+const updateBDdata = async (dir, type) => {
+  const xlsxdata = await xlsxpars(dir);
+  switch (type) {
+    case "ToolSPmatNo":
+      await ToolSPmatNo.destroy({ where: {}, truncate: true });
+      await ToolSPmatNo.bulkCreate(xlsxdata);
+      break;
+    case "ToolPath":
+      await ToolPaths.destroy({ where: {}, truncate: true });
+      await ToolPaths.bulkCreate(xlsxdata);
+      break;
+    case "SPmatNo":
+      await SPmatNo.destroy({ where: {}, truncate: true });
+      await SPmatNo.bulkCreate(xlsxdata);
+      break;
+    default:
+      throw new Error(`Some problem with format ${type}!`);
+  }
+  return `${type} with data from ${dir} created!`;
 };
 
-const updateToolSPmatNo_All = async (data) => {
-  await ToolSPmatNo.bulkCreate(data);
-};
-
-const updateSPmatNo_All = async (data) => {
-  await SPmatNo.bulkCreate(data);
-};
+export { updateBDdata };

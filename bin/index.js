@@ -41,7 +41,6 @@ const start = async () => {
           const answer = await createAnswer(text, cliId, doc, thumbPath);
           console.log(answer);
           try {
-            console.log(answer);
             if (Array.isArray(answer)) {
               const prom = answer.map(async (el) => {
                 if (el.option.parse_mode) {

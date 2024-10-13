@@ -4,8 +4,8 @@ import botoptions from "../botoptions.js";
 import { all } from "axios";
 
 const getInfofromBd = async (climsg, page = 0) => {
-  let answer = [];
-
+  var answer = [];
+console.log(answer)
   const toolinfo = async (tool) =>
     await ToolPaths.findAll({
       where: {
@@ -28,8 +28,8 @@ const getInfofromBd = async (climsg, page = 0) => {
   });
 
   if (spinfo[0]) {
-    const { name, char, price, warehousestatus } = spinfo[0].dataValues;
-    const text = `${name}\n
+    const { name, char, price, warehousestatus,spmatNo } = spinfo[0].dataValues;
+    const text = `${spmatNo}\n${name}\n
 ⚒️ Характеристика: ${char || "Нет информации"}\n
 💵 Цена: ${price || "Нет информации"} руб\n
 🏠 Склад: ${warehousestatus || "Нет информации"}`;
@@ -44,6 +44,7 @@ const getInfofromBd = async (climsg, page = 0) => {
     const tools_inline_keyboard_promise = toolsByspmas.map(async (el) => {
       const { tool_code } = el.dataValues;
       return toolinfo(tool_code).then((res) => {
+        if(!res[0]){return [{ text: `${tool_code} - нет схемы` , callback_data: tool_code }]}
         return [
           { text: res[0].dataValues.tool_name, callback_data: tool_code },
         ];
@@ -74,10 +75,9 @@ const getInfofromBd = async (climsg, page = 0) => {
         [{ text: "all", callback_data: `${climsg}%${100}` }]
       );
     }
-    console.log(tools_inline_keyboard.length);
     answer.push(
-      { text: "Tools", option: tools_inline_keyboard },
-      { text: "analog", option: analog_inline_keyboard }
+      { text: "Вы можете выбрать инструмент", option: tools_inline_keyboard },
+      { text: "Есть аналоги 🔁", option: analog_inline_keyboard }
     );
   } else {
     if (toolanswer[0]) {

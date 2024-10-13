@@ -79,10 +79,12 @@ const updateToolSPmatNo = async (code, data) => {
 const updatewarehouse = async (data) => {
   try {
     const promises = data.map((el) => {
-      SPmatNo.findOne({ where: { spmatNo: el.spmatNo } }).then(function (obj) {
-        if (obj) return obj.update(el);
-        return SPmatNo.create(el);
-      });
+      SPmatNo.findOne({ where: { spmatNo: el.spmatNo.toString() } }).then(
+        function (obj) {
+          if (obj) return obj.update(el);
+          return SPmatNo.create(el);
+        }
+      );
     });
     return Promise.all(promises).then(() => {
       return {
