@@ -33,7 +33,7 @@ const getInfofromBd = async (climsg) => {
 ⚒️ Характеристика: ${char || "Нет информации"}\n
 💵 Цена: ${price || "Нет информации"} руб\n
 🏠 Склад: ${warehousestatus || "Нет информации"}`;
-    answer.push({ spinfo, text, option: botoptions.defaultoption });
+    answer.push({ priznak: "spinfo", text, option: botoptions.defaultoption });
     const toolsByspmas = await ToolSPmatNo.findAll({
       where: {
         [Op.or]: [{ spmatNo: climsg }],
@@ -116,7 +116,10 @@ const getInfofromBd = async (climsg) => {
       option: toolsByName_inline_keyboard,
     });
   } else {
-    answer = { text: "there is no info", option: botoptions.defaultoption };
+    answer = {
+      text: "Информации не найдено((",
+      option: botoptions.defaultoption,
+    };
   }
 
   //{ text:tooldata[0].dataValues, option: botoptions.defaultoption };

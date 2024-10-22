@@ -174,33 +174,86 @@ const start = async () => {
       default:
         try {
           const cbtext = text.split("%");
+          console.log(cbtext);
+
           const answer = await createAnswerForCallback(cbtext[2] || cbtext[0]);
+          console.log(answer);
           if (Array.isArray(answer)) {
-            let mas;
-            switch (cbtext[1]) {
-              case "toolsBySP":
-                mas = answer[1];
-                break;
-              case "analog":
-                mas = answer[2];
-                break;
-              case "toolsbyName":
-                mas = answer[0];
-                break;
+            if (answer[0].priznak === "spinfo" && cbtext[2] === undefined) {
+              await bot.sendMessage(chatId, answer[0].text);
+              if (answer[2].priznak === "analog") {
+                const analog_msg_id = await bot.sendMessage(chatId, "analog");
+                setTimeout(async () => {
+                  if (answer[2].option.length === 0) {
+                    return await bot.deleteMessage(
+                      analog_msg_id.chat.id,
+                      analog_msg_id.message_id
+                    );
+                  }
+                  await bot.editMessageText(answer[2].text, {
+                    chat_id: analog_msg_id.chat.id,
+                    message_id: analog_msg_id.message_id,
+                    reply_markup: {
+                      inline_keyboard: paginatemsg(
+                        answer[2].option,
+                        analog_msg_id.message_id,
+                        text,
+                        "analog"
+                      ),
+                    },
+                  });
+                }, 0);
+              }
+              if (answer[1].priznak === "tool") {
+                const tools_msg_id = await bot.sendMessage(chatId, "toolsBySP");
+                setTimeout(async () => {
+                  if (answer[1].option.length === 0) {
+                    return await bot.deleteMessage(
+                      tools_msg_id.chat.id,
+                      tools_msg_id.message_id
+                    );
+                  }
+                  await bot.editMessageText(answer[1].text, {
+                    chat_id: tools_msg_id.chat.id,
+                    message_id: tools_msg_id.message_id,
+                    reply_markup: {
+                      inline_keyboard: paginatemsg(
+                        answer[1].option,
+                        tools_msg_id.message_id,
+                        text,
+                        "toolsBySP"
+                      ),
+                    },
+                  });
+                }, 0);
+              }
+            } else {
+              let mas;
+              switch (cbtext[1]) {
+                case "toolsBySP":
+                  mas = answer[1];
+                  break;
+                case "analog":
+                  mas = answer[2];
+                  break;
+                case "toolsbyName":
+                  mas = answer[0];
+                  break;
+              }
+              await bot.editMessageText(mas.text, {
+                chat_id: chatId,
+                message_id: cbtext[0],
+                reply_markup: {
+                  inline_keyboard: paginatemsg(
+                    mas.option,
+                    cbtext[0],
+                    cbtext[2],
+                    cbtext[1],
+                    Number(cbtext[3])
+                  ),
+                },
+              });
             }
-            await bot.editMessageText(mas.text, {
-              chat_id: chatId,
-              message_id: cbtext[0],
-              reply_markup: {
-                inline_keyboard: paginatemsg(
-                  mas.option,
-                  cbtext[0],
-                  cbtext[2],
-                  cbtext[1],
-                  Number(cbtext[3])
-                ),
-              },
-            });
           } else {
             await bot.sendMessage(
               chatId,
