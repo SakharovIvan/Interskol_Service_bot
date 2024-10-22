@@ -37,7 +37,11 @@ const createAnswer = async (text, cliId, doc, link = "") => {
             answer.text === `${filepars.tool} created` ||
             answer.text === `${filepars.tool} updated`
           ) {
-             await movefiletomaindir(filepars.data.tool_path, "/public/toolPDF");
+            await movefiletomaindir(
+              filepars.data.tool_path,
+              "/public/toolPDF",
+              true
+            );
           }
           break;
         case "toolsp":
@@ -82,9 +86,9 @@ const createAnswerForCallback = async (text, cliId) => {
       case text === "commitToolChanges-true":
         const { tool, data } = status;
         answer = await updateToolByCode(tool, data, true);
-        await movefiletomaindir(data.tool_path, "/public/toolPDF");
+        await movefiletomaindir(data.tool_path, "/public/toolPDF", true);
         return answer;
-      case text === "commitToolChanges-false":
+       case text === "commitToolChanges-false":
         answer = {
           text: `work with ${status.tool} stoped`,
           option: botoptions.defaultoption,
@@ -92,9 +96,7 @@ const createAnswerForCallback = async (text, cliId) => {
         await deletefilefromTemp(status.data.tool_path);
         return answer;
       default:
-
-        const cbtext = text.split("%");
-        answer = await getInfofromBd(cbtext[0], Number(cbtext[1]) || 0);
+        answer = await getInfofromBd(text);
     }
   } catch (error) {
     console.log(error);

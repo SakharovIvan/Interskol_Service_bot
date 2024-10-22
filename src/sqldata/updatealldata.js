@@ -1,6 +1,7 @@
 import { ToolPaths, ToolSPmatNo, SPmatNo } from "./models.js";
 import reader from "xlsx";
 import path from "path";
+import XLSX from "xlsx";
 import { error } from "console";
 const __filename = process.cwd();
 
@@ -64,5 +65,21 @@ const updateBDdata = async (dir, type) => {
   }
   return `${type} with data from ${dir} created!`;
 };
+
+const createXLSXfromJSON = (jsa, type) => {
+    const worksheet = XLSX.utils.json_to_sheet(jsa);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "List 1");
+    XLSX.writeFile(workbook, "GISdata.xlsx");
+    return;
+  };
+
+  try {
+    const jso =await ToolSPmatNo.findAll({where:{spmatNo: "434.04.02.00.00"}, raw: true })
+
+    console.log(jso) 
+  } catch (error) {
+    console.log(error)
+  }
 
 export { updateBDdata };

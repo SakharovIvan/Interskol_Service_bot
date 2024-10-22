@@ -23,17 +23,14 @@ const movefiletomaindir = async (filePath, newfilePath, deletemode = false) => {
         if (err) {
           console.log(err);
         }
+
         console.log("File copied successfully");
-        if (deletemode) {
-          fs.rm(path.join(__filename, filePath), (err) => {
-            if (err) {
-              console.log(err);
-            }
-            console.log("File deleted successfully");
-          });
-        }
       }
     );
+
+    if (deletemode) {
+      await deletefilefromTemp(filePath);
+    }
   } catch (error) {
     console.log(error);
   }

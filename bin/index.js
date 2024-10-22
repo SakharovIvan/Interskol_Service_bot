@@ -4,17 +4,12 @@ const bot = new TelegramAPI(token, { polling: true });
 import answers from "../public/answers.js";
 import { createAnswer, createAnswerForCallback } from "../src/index.js";
 import path from "path";
-const msgoption = {
-  parse_mode: "Markdown",
-  reply_markup: {
-    resize_keyboard: true,
-  },
-};
-
+import fs from "fs";
+import botoptions from "../src/botoptions.js";
+import paginatemsg from "../src/utils/paginatemsg.js";
 const start = async () => {
   bot.setMyCommands([
     { command: "/start", description: "Начальное приветствие" },
-    { command: "/admin", description: "Admin" },
   ]);
 
   bot.on("message", async (msg) => {
@@ -28,10 +23,22 @@ const start = async () => {
     try {
       switch (true) {
         case text === "/start":
-          await bot.sendMessage(chatId, answers.textStart, msgoption);
+          const stream = fs.createReadStream(
+            "//home/petProjects/Interskol_Service_bot/public/images/INTERSOL_logo.jpg"
+          );
+          await bot.sendPhoto(chatId, stream);
+          await bot.sendMessage(
+            chatId,
+            answers.textStart,
+            botoptions.defaultoption
+          );
           break;
         case text === "/admin":
-          await bot.sendMessage(chatId, answers.textStart, msgoption);
+          await bot.sendMessage(
+            chatId,
+            answers.textAdminPanel,
+            botoptions.admin
+          );
           break;
         default:
           let thumbPath;
@@ -39,24 +46,51 @@ const start = async () => {
             thumbPath = await bot.getFileLink(msg.document.file_id);
           }
           const answer = await createAnswer(text, cliId, doc, thumbPath);
-          console.log(answer);
           try {
             if (Array.isArray(answer)) {
-              const prom = answer.map(async (el) => {
-                if (el.option.parse_mode) {
-                  await bot.sendMessage(chatId, el.text, el.option);
-                } else {
-                  if (el.option.length === 0) {
-                    return;
-                  }
-                  await bot.sendMessage(chatId, el.text, {
-                    reply_markup: {
-                      inline_keyboard: el.option,
-                    },
-                  });
+              await bot.sendMessage(chatId, answer[0].text, answer[0].option);
+              const analog_msg_id = await bot.sendMessage(chatId, "analog");
+              setTimeout(async () => {
+                if (answer[2].option.length === 0) {
+                  return await bot.deleteMessage(
+                    analog_msg_id.chat.id,
+                    analog_msg_id.message_id
+                  );
                 }
-              });
-              Promise.all(prom);
+                await bot.editMessageText(answer[2].text, {
+                  chat_id: analog_msg_id.chat.id,
+                  message_id: analog_msg_id.message_id,
+                  reply_markup: {
+                    inline_keyboard: paginatemsg(
+                      answer[2].option,
+                      analog_msg_id.message_id,
+                      text,
+                      "analog"
+                    ),
+                  },
+                });
+              }, 0);
+              const tools_msg_id = await bot.sendMessage(chatId, "toolsBySP");
+              setTimeout(async () => {
+                if (answer[1].option.length === 0) {
+                  return await bot.deleteMessage(
+                    tools_msg_id.chat.id,
+                    tools_msg_id.message_id
+                  );
+                }
+                await bot.editMessageText(answer[1].text, {
+                  chat_id: tools_msg_id.chat.id,
+                  message_id: tools_msg_id.message_id,
+                  reply_markup: {
+                    inline_keyboard: paginatemsg(
+                      answer[1].option,
+                      tools_msg_id.message_id,
+                      text,
+                      "toolsBySP"
+                    ),
+                  },
+                });
+              }, 0);
             } else {
               await bot.sendMessage(
                 chatId,
@@ -85,25 +119,31 @@ const start = async () => {
     const text = msg.data;
     const chatId = msg.message.chat.id;
     try {
-      const answer = await createAnswerForCallback(text, cliId);
-      console.log(answer);
+      const cbtext = text.split("%");
+      const answer = await createAnswerForCallback(cbtext[2] || cbtext[0]);
       if (Array.isArray(answer)) {
-        const prom = answer.map(async (el) => {
-          if (el.option.parse_mode) {
-            await bot.sendMessage(chatId, el.text, el.option);
-          } else {
-            if (el.option.length === 0) {
-              return;
-            }
-            await bot.sendMessage(chatId, el.text, {
-              reply_markup: {
-                inline_keyboard: el.option,
-              },
-            });
-          }
+        let mas;
+        switch (cbtext[1]) {
+          case "toolsBySP":
+            mas = answer[1];
+            break;
+          case "analog":
+            mas = answer[2];
+            break;
+        }
+        await bot.editMessageText(mas.text, {
+          chat_id: chatId,
+          message_id: cbtext[0],
+          reply_markup: {
+            inline_keyboard: paginatemsg(
+              mas.option,
+              cbtext[0],
+              cbtext[2],
+              cbtext[1],
+              Number(cbtext[3])
+            ),
+          },
         });
-        Promise.all(prom);
-        Promise.all(prom);
       } else {
         await bot.sendMessage(
           chatId,
@@ -118,7 +158,11 @@ const start = async () => {
         }
       }
     } catch (error) {
-      await bot.sendMessage(chatId, "problem with callback_query", msgoption);
+      await bot.sendMessage(
+        chatId,
+        "problem with callback_query",
+        botoptions.defaultoption
+      );
       return;
     }
   });

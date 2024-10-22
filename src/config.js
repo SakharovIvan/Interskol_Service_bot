@@ -10,11 +10,20 @@ const sequelize = new Sequelize({
   password: "root",
   host: "127.0.0.1",
   port: 5432,
-  logging: false  ,
+  //logging: false,
   //ssl: true,
   //clientMinMessages: 'notice',
 });
 
-const adminID = [916996491];
+const adminID = [916996491, 289644699, 5192613078];
+const emailConfig = {
+  host: "smtp.lancloud.ru",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "gis@kls-gr.ru",
+    pass: "nP8ecQ51",
+  },
+};
 
-export { sequelize, token, adminID };
+export { sequelize, token, adminID, emailConfig };

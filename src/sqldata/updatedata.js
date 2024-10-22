@@ -102,6 +102,7 @@ const updatewarehouse = async (data) => {
 
 const updateanalog = async (data) => {
   try {
+    await SPanalog.destroy({ truncate: true });
     await SPanalog.bulkCreate(data);
     return {
       text: `Analog updated`,

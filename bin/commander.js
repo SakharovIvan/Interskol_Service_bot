@@ -6,7 +6,7 @@ const program = new Command();
 program
   .name("telegabot-helper")
   .version("0.1.0")
-  .description("Update all information")
+  .description("Update all information from bd")
   .argument("<filepath>")
   .option(
     "-f, --format <type>",
@@ -14,8 +14,8 @@ program
   )
   .helpOption("-h, --help", "output usage information")
   .action(async (filepath, option) => {
-    const diff = await updateBDdata(filepath, option.format);
-    console.log(diff);
+    const res = await updateBDdata(filepath, option.format);
+    console.log(res);
   });
 
 program.parse();
