@@ -7,6 +7,7 @@ import path from "path";
 import fs from "fs";
 import botoptions from "../src/botoptions.js";
 import paginatemsg from "../src/utils/paginatemsg.js";
+import { MessageLog } from "../src/sqldata/models.js";
 
 const start = async () => {
   bot.setMyCommands([
@@ -22,6 +23,7 @@ const start = async () => {
     const doc = msg.document;
 
     try {
+      await MessageLog.create({ cliId, text, chatId, username });
       switch (true) {
         case text === "/start":
           const stream = fs.createReadStream(
@@ -151,55 +153,75 @@ const start = async () => {
     const cliId = msg.from.id;
     const text = msg.data;
     const chatId = msg.message.chat.id;
-    try {
-      const cbtext = text.split("%");
-      const answer = await createAnswerForCallback(cbtext[2] || cbtext[0]);
-      if (Array.isArray(answer)) {
-        let mas;
-        switch (cbtext[1]) {
-          case "toolsBySP":
-            mas = answer[1];
-            break;
-          case "analog":
-            mas = answer[2];
-            break;
-          case "toolsbyName":
-            mas = answer[0];
-            break;
-        }
-        await bot.editMessageText(mas.text, {
-          chat_id: chatId,
-          message_id: cbtext[0],
-          reply_markup: {
-            inline_keyboard: paginatemsg(
-              mas.option,
-              cbtext[0],
-              cbtext[2],
-              cbtext[1],
-              Number(cbtext[3])
-            ),
-          },
-        });
-      } else {
-        await bot.sendMessage(
+    switch (text) {
+      case "Excel_template":
+        await bot.sendDocument(
           chatId,
-          answer.text.tool_name || answer.text,
-          answer.option
+          path.join(process.cwd(), "/public/Price_list_warehouse.xlsx")
         );
-        if (answer.text.tool_path) {
-          await bot.sendDocument(
+        break;
+      case "email_BD":
+        await bot.sendMessage(chatId, "Выберите БД", botoptions.adminBDtopost);
+        break;
+      case "email_log_BD":
+        break;
+      case "Excel_analog_template":
+        await bot.sendDocument(
+          chatId,
+          path.join(process.cwd(), "/public/analog_template.xlsx")
+        );
+        break;
+      default:
+        try {
+          const cbtext = text.split("%");
+          const answer = await createAnswerForCallback(cbtext[2] || cbtext[0]);
+          if (Array.isArray(answer)) {
+            let mas;
+            switch (cbtext[1]) {
+              case "toolsBySP":
+                mas = answer[1];
+                break;
+              case "analog":
+                mas = answer[2];
+                break;
+              case "toolsbyName":
+                mas = answer[0];
+                break;
+            }
+            await bot.editMessageText(mas.text, {
+              chat_id: chatId,
+              message_id: cbtext[0],
+              reply_markup: {
+                inline_keyboard: paginatemsg(
+                  mas.option,
+                  cbtext[0],
+                  cbtext[2],
+                  cbtext[1],
+                  Number(cbtext[3])
+                ),
+              },
+            });
+          } else {
+            await bot.sendMessage(
+              chatId,
+              answer.text.tool_name || answer.text,
+              answer.option
+            );
+            if (answer.text.tool_path) {
+              await bot.sendDocument(
+                chatId,
+                path.join(process.cwd(), answer.text.tool_path)
+              );
+            }
+          }
+        } catch (error) {
+          await bot.sendMessage(
             chatId,
-            path.join(process.cwd(), answer.text.tool_path)
+            "problem with callback_query",
+            botoptions.defaultoption
           );
+          return;
         }
-      }
-    } catch (error) {
-      await bot.sendMessage(
-        chatId,
-        "problem with callback_query",
-        botoptions.defaultoption
-      );
-      return;
     }
   });
 };

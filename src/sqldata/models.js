@@ -5,7 +5,8 @@ class ToolPaths extends Model {}
 class ToolSPmatNo extends Model {}
 class SPmatNo extends Model {}
 class SPanalog extends Model {}
-
+class MessageLog extends Model {}
+class CliInfo extends Model {}
 ToolPaths.init(
   {
     id: {
@@ -112,4 +113,56 @@ SPanalog.init(
   }
 );
 
-export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog };
+MessageLog.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4,
+    },
+    cliId: {
+      type: DataTypes.STRING,
+    },
+    text: {
+      type: DataTypes.STRING,
+    },
+    chatId: {
+      type: DataTypes.STRING,
+    },
+    username: {
+      type: DataTypes.STRING,
+    },
+  },
+  {
+    sequelize,
+    createdAt: true,
+  }
+);
+
+CliInfo.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4,
+    },
+    cliId: {
+      type: DataTypes.STRING,
+    },
+    email: {
+      type: DataTypes.STRING,
+    },
+    addres: {
+      type: DataTypes.STRING,
+    },
+    cli_name: {
+      type: DataTypes.STRING,
+    },
+  },
+  {
+    sequelize,
+    createdAt: true,
+  }
+);
+
+export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog, MessageLog,CliInfo};

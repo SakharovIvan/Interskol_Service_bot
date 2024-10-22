@@ -10,7 +10,7 @@ export default {
       inline_keyboard: [
         [
           {
-            text: "Шаблоны для импорта EXCEL ",
+            text: "Шаблоны для импорта EXCEL склад - цены",
             callback_data: "Excel_template",
           },
         ],
@@ -21,13 +21,31 @@ export default {
           },
           {
             text: "Отправить Логи на почту",
-            callback_data: "email_log_BD",
+            callback_data: "Excel_BD_MessageLog",
           },
         ],
         [
           {
-            text: "Личный кабинет",
-            callback_data: "LS",
+            text: "Шаблон для импорта аналогов",
+            callback_data: "Excel_analog_template",
+          },
+        ],
+      ],
+    },
+  },
+  adminBDtopost: {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "ToolSPmatNo",
+            callback_data: "Excel_BD_ToolSPmatNo",
+          },
+        ],
+        [
+          {
+            text: "SPmatNo",
+            callback_data: "Excel_BD_SPmatNo",
           },
         ],
       ],

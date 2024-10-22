@@ -2,7 +2,6 @@ import { ToolPaths, ToolSPmatNo, SPmatNo } from "./models.js";
 import reader from "xlsx";
 import path from "path";
 import XLSX from "xlsx";
-import { error } from "console";
 const __filename = process.cwd();
 
 const xlsxpars = async (file) => {

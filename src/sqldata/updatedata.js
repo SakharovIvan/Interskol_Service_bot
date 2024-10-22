@@ -38,7 +38,6 @@ const updateToolByCode = async (code, data, commit = false) => {
 };
 
 const updateToolSPmatNo = async (code, data) => {
-  console.log(data);
   const newdata = data.map((info) => {
     return {
       tool_code: code,
