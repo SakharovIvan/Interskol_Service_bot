@@ -33,7 +33,7 @@ const getInfofromBd = async (climsg) => {
 ⚒️ Характеристика: ${char || "Нет информации"}\n
 💵 Цена: ${price || "Нет информации"} руб\n
 🏠 Склад: ${warehousestatus || "Нет информации"}`;
-    answer.push({ text, option: botoptions.defaultoption });
+    answer.push({ spinfo, text, option: botoptions.defaultoption });
     const toolsByspmas = await ToolSPmatNo.findAll({
       where: {
         [Op.or]: [{ spmatNo: climsg }],
@@ -75,10 +75,15 @@ const getInfofromBd = async (climsg) => {
 
     answer.push(
       {
+        priznak: "tool",
         text: "Вы можете выбрать инструмент",
         option: tools_inline_keyboard,
       },
-      { text: "Есть аналоги 🔁", option: analog_inline_keyboard }
+      {
+        priznak: "analog",
+        text: "Есть аналоги 🔁",
+        option: analog_inline_keyboard,
+      }
     );
   } else if (toolanswer[0]) {
     answer = {
@@ -86,8 +91,30 @@ const getInfofromBd = async (climsg) => {
       option: botoptions.defaultoption,
     };
   } else if (toolsByName[0]) {
-    console.log(toolsByName);
-    answer = { text: "found tools by name", option: botoptions.defaultoption };
+    const toolsByName_inline_keyboard_promise = toolsByName.map(async (el) => {
+      const { tool_code } = el.dataValues;
+      return toolinfo(tool_code).then((res) => {
+        if (!res[0]) {
+          return [
+            { text: `${tool_code} - нет схемы`, callback_data: tool_code },
+          ];
+        }
+        return [
+          {
+            text: res[0].dataValues.tool_name.slice(0, -4),
+            callback_data: tool_code,
+          },
+        ];
+      });
+    });
+    const toolsByName_inline_keyboard = await Promise.all(
+      toolsByName_inline_keyboard_promise
+    );
+    answer.push({
+      priznak: "toolsbyname",
+      text: "Найдены инструменты по наименованию",
+      option: toolsByName_inline_keyboard,
+    });
   } else {
     answer = { text: "there is no info", option: botoptions.defaultoption };
   }

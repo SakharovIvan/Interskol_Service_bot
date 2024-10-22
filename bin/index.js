@@ -7,6 +7,7 @@ import path from "path";
 import fs from "fs";
 import botoptions from "../src/botoptions.js";
 import paginatemsg from "../src/utils/paginatemsg.js";
+
 const start = async () => {
   bot.setMyCommands([
     { command: "/start", description: "Начальное приветствие" },
@@ -24,7 +25,7 @@ const start = async () => {
       switch (true) {
         case text === "/start":
           const stream = fs.createReadStream(
-            "//home/petProjects/Interskol_Service_bot/public/images/INTERSOL_logo.jpg"
+            path.join(process.cwd(), "/public/images/INTERSOL_logo.jpg")
           );
           await bot.sendPhoto(chatId, stream);
           await bot.sendMessage(
@@ -48,49 +49,81 @@ const start = async () => {
           const answer = await createAnswer(text, cliId, doc, thumbPath);
           try {
             if (Array.isArray(answer)) {
-              await bot.sendMessage(chatId, answer[0].text, answer[0].option);
-              const analog_msg_id = await bot.sendMessage(chatId, "analog");
-              setTimeout(async () => {
-                if (answer[2].option.length === 0) {
-                  return await bot.deleteMessage(
-                    analog_msg_id.chat.id,
-                    analog_msg_id.message_id
-                  );
-                }
-                await bot.editMessageText(answer[2].text, {
-                  chat_id: analog_msg_id.chat.id,
-                  message_id: analog_msg_id.message_id,
-                  reply_markup: {
-                    inline_keyboard: paginatemsg(
-                      answer[2].option,
-                      analog_msg_id.message_id,
-                      text,
-                      "analog"
-                    ),
-                  },
-                });
-              }, 0);
-              const tools_msg_id = await bot.sendMessage(chatId, "toolsBySP");
-              setTimeout(async () => {
-                if (answer[1].option.length === 0) {
-                  return await bot.deleteMessage(
-                    tools_msg_id.chat.id,
-                    tools_msg_id.message_id
-                  );
-                }
-                await bot.editMessageText(answer[1].text, {
-                  chat_id: tools_msg_id.chat.id,
-                  message_id: tools_msg_id.message_id,
-                  reply_markup: {
-                    inline_keyboard: paginatemsg(
-                      answer[1].option,
-                      tools_msg_id.message_id,
-                      text,
-                      "toolsBySP"
-                    ),
-                  },
-                });
-              }, 0);
+              if (answer[0].priznak === "toolsbyname") {
+                const toolsbyname_msg_id = await bot.sendMessage(
+                  chatId,
+                  "toolsbyName"
+                );
+                setTimeout(async () => {
+                  if (answer[0].option.length === 0) {
+                    return await bot.deleteMessage(
+                      toolsbyname_msg_id.chat.id,
+                      toolsbyname_msg_id.message_id
+                    );
+                  }
+                  await bot.editMessageText(answer[0].text, {
+                    chat_id: toolsbyname_msg_id.chat.id,
+                    message_id: toolsbyname_msg_id.message_id,
+                    reply_markup: {
+                      inline_keyboard: paginatemsg(
+                        answer[0].option,
+                        analog_msg_id.message_id,
+                        text,
+                        "toolsbyName"
+                      ),
+                    },
+                  });
+                }, 0);
+              } else {
+                await bot.sendMessage(chatId, answer[0].text);
+              }
+
+              if (answer[2].priznak === "analog") {
+                const analog_msg_id = await bot.sendMessage(chatId, "analog");
+                setTimeout(async () => {
+                  if (answer[2].option.length === 0) {
+                    return await bot.deleteMessage(
+                      analog_msg_id.chat.id,
+                      analog_msg_id.message_id
+                    );
+                  }
+                  await bot.editMessageText(answer[2].text, {
+                    chat_id: analog_msg_id.chat.id,
+                    message_id: analog_msg_id.message_id,
+                    reply_markup: {
+                      inline_keyboard: paginatemsg(
+                        answer[2].option,
+                        analog_msg_id.message_id,
+                        text,
+                        "analog"
+                      ),
+                    },
+                  });
+                }, 0);
+              }
+              if (answer[1].priznak === "tool") {
+                const tools_msg_id = await bot.sendMessage(chatId, "toolsBySP");
+                setTimeout(async () => {
+                  if (answer[1].option.length === 0) {
+                    return await bot.deleteMessage(
+                      tools_msg_id.chat.id,
+                      tools_msg_id.message_id
+                    );
+                  }
+                  await bot.editMessageText(answer[1].text, {
+                    chat_id: tools_msg_id.chat.id,
+                    message_id: tools_msg_id.message_id,
+                    reply_markup: {
+                      inline_keyboard: paginatemsg(
+                        answer[1].option,
+                        tools_msg_id.message_id,
+                        text,
+                        "toolsBySP"
+                      ),
+                    },
+                  });
+                }, 0);
+              }
             } else {
               await bot.sendMessage(
                 chatId,
@@ -129,6 +162,9 @@ const start = async () => {
             break;
           case "analog":
             mas = answer[2];
+            break;
+          case "toolsbyName":
+            mas = answer[0];
             break;
         }
         await bot.editMessageText(mas.text, {

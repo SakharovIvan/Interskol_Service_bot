@@ -88,7 +88,7 @@ const createAnswerForCallback = async (text, cliId) => {
         answer = await updateToolByCode(tool, data, true);
         await movefiletomaindir(data.tool_path, "/public/toolPDF", true);
         return answer;
-       case text === "commitToolChanges-false":
+      case text === "commitToolChanges-false":
         answer = {
           text: `work with ${status.tool} stoped`,
           option: botoptions.defaultoption,
@@ -105,7 +105,6 @@ const createAnswerForCallback = async (text, cliId) => {
       option: botoptions.defaultoption,
     };
   }
-  console.log(answer);
   return answer;
 };
 

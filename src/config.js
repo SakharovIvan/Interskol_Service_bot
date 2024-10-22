@@ -10,7 +10,7 @@ const sequelize = new Sequelize({
   password: "root",
   host: "127.0.0.1",
   port: 5432,
-  //logging: false,
+  logging: false,
   //ssl: true,
   //clientMinMessages: 'notice',
 });
