@@ -30,6 +30,12 @@ export default {
             callback_data: "Excel_analog_template",
           },
         ],
+        [
+          {
+            text: "Шаблон для импорта Списка зч к инструменту",
+            callback_data: "Excel_tool-sp_template",
+          },
+        ],
       ],
     },
   },

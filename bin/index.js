@@ -9,6 +9,95 @@ import botoptions from "../src/botoptions.js";
 import paginatemsg from "../src/utils/paginatemsg.js";
 import { MessageLog } from "../src/sqldata/models.js";
 
+const sendMsg = async (answer, chatId, text, page, msgid, bd) => {
+  if (answer.spinfoanswer && bd === undefined) {
+    await bot.sendMessage(
+      chatId,
+      answer.spinfoanswer.text,
+      answer.spinfoanswer.option
+    );
+  }
+  if (answer.analogSP && (bd === undefined || bd === "analog")) {
+    const analog_msg_id =
+      page === undefined ? await bot.sendMessage(chatId, "analog") : {};
+    setTimeout(async () => {
+      if (answer.analogSP.option.length === 0) {
+        return await bot.deleteMessage(chatId, analog_msg_id.message_id);
+      }
+      await bot.editMessageText(answer.analogSP.text, {
+        chat_id: chatId,
+        message_id: analog_msg_id.message_id || msgid,
+        reply_markup: {
+          inline_keyboard: paginatemsg(
+            answer.analogSP.option,
+            analog_msg_id.message_id || msgid,
+            text,
+            "analog",
+            page
+          ),
+        },
+      });
+    }, 0);
+  }
+  if (answer.toolsForSP && (bd === undefined || bd === "toolsBySP")) {
+    const tools_msg_id =
+      page === undefined ? await bot.sendMessage(chatId, "toolsBySP") : {};
+
+    setTimeout(async () => {
+      if (answer.toolsForSP.option.length === 0) {
+        return await bot.deleteMessage(chatId, tools_msg_id.message_id);
+      }
+      await bot.editMessageText(answer.toolsForSP.text, {
+        chat_id: chatId,
+        message_id: tools_msg_id.message_id || msgid,
+        reply_markup: {
+          inline_keyboard: paginatemsg(
+            answer.toolsForSP.option,
+            tools_msg_id.message_id || msgid,
+            text,
+            "toolsBySP",
+            page
+          ),
+        },
+      });
+    }, 0);
+  }
+  if (answer.toolsByName && (bd === undefined || bd === "toolsbyName")) {
+    const toolsbyname_msg_id =
+      page === undefined ? await bot.sendMessage(chatId, "toolsbyName") : {};
+    setTimeout(async () => {
+      if (answer.toolsByName.option.length === 0) {
+        return await bot.deleteMessage(chatId, toolsbyname_msg_id.message_id);
+      }
+      await bot.editMessageText(answer.toolsByName.text, {
+        chat_id: chatId,
+        message_id: toolsbyname_msg_id.message_id || msgid,
+        reply_markup: {
+          inline_keyboard: paginatemsg(
+            answer.toolsByName.option,
+            toolsbyname_msg_id.message_id || msgid,
+            text,
+            "toolsbyName",
+            page
+          ),
+        },
+      });
+    }, 0);
+  }
+  if (answer.toolinfoanswer) {
+    await bot.sendMessage(chatId, answer.toolinfoanswer.text.tool_name);
+    if (answer.toolinfoanswer.text.tool_path) {
+      const stream = fs.createReadStream(
+        path.join(process.cwd(), answer.toolinfoanswer.text.tool_path)
+      );
+      await bot.sendDocument(chatId, stream);
+    }
+  }
+  if (answer.noImfo) {
+    await bot.sendMessage(chatId, answer.noImfo.text, answer.noImfo.option);
+  }
+};
+
 const start = async () => {
   bot.setMyCommands([
     { command: "/start", description: "Начальное приветствие" },
@@ -50,95 +139,7 @@ const start = async () => {
           }
           const answer = await createAnswer(text, cliId, doc, thumbPath);
           try {
-            if (Array.isArray(answer)) {
-              if (answer[0].priznak === "toolsbyname") {
-                const toolsbyname_msg_id = await bot.sendMessage(
-                  chatId,
-                  "toolsbyName"
-                );
-                setTimeout(async () => {
-                  if (answer[0].option.length === 0) {
-                    return await bot.deleteMessage(
-                      toolsbyname_msg_id.chat.id,
-                      toolsbyname_msg_id.message_id
-                    );
-                  }
-                  await bot.editMessageText(answer[0].text, {
-                    chat_id: toolsbyname_msg_id.chat.id,
-                    message_id: toolsbyname_msg_id.message_id,
-                    reply_markup: {
-                      inline_keyboard: paginatemsg(
-                        answer[0].option,
-                        analog_msg_id.message_id,
-                        text,
-                        "toolsbyName"
-                      ),
-                    },
-                  });
-                }, 0);
-              } else {
-                await bot.sendMessage(chatId, answer[0].text);
-              }
-
-              if (answer[2].priznak === "analog") {
-                const analog_msg_id = await bot.sendMessage(chatId, "analog");
-                setTimeout(async () => {
-                  if (answer[2].option.length === 0) {
-                    return await bot.deleteMessage(
-                      analog_msg_id.chat.id,
-                      analog_msg_id.message_id
-                    );
-                  }
-                  await bot.editMessageText(answer[2].text, {
-                    chat_id: analog_msg_id.chat.id,
-                    message_id: analog_msg_id.message_id,
-                    reply_markup: {
-                      inline_keyboard: paginatemsg(
-                        answer[2].option,
-                        analog_msg_id.message_id,
-                        text,
-                        "analog"
-                      ),
-                    },
-                  });
-                }, 0);
-              }
-              if (answer[1].priznak === "tool") {
-                const tools_msg_id = await bot.sendMessage(chatId, "toolsBySP");
-                setTimeout(async () => {
-                  if (answer[1].option.length === 0) {
-                    return await bot.deleteMessage(
-                      tools_msg_id.chat.id,
-                      tools_msg_id.message_id
-                    );
-                  }
-                  await bot.editMessageText(answer[1].text, {
-                    chat_id: tools_msg_id.chat.id,
-                    message_id: tools_msg_id.message_id,
-                    reply_markup: {
-                      inline_keyboard: paginatemsg(
-                        answer[1].option,
-                        tools_msg_id.message_id,
-                        text,
-                        "toolsBySP"
-                      ),
-                    },
-                  });
-                }, 0);
-              }
-            } else {
-              await bot.sendMessage(
-                chatId,
-                answer.text.tool_name,
-                answer.option
-              );
-              if (answer.text.tool_path) {
-                await bot.sendDocument(
-                  chatId,
-                  path.join(process.cwd(), answer.text.tool_path)
-                );
-              }
-            }
+            await sendMsg(answer, chatId, text);
           } catch {
             await bot.sendMessage(chatId, answer.text, answer.option);
           }
@@ -153,6 +154,7 @@ const start = async () => {
     const cliId = msg.from.id;
     const text = msg.data;
     const chatId = msg.message.chat.id;
+    let answer;
     switch (text) {
       case "Excel_template":
         await bot.sendDocument(
@@ -171,101 +173,35 @@ const start = async () => {
           path.join(process.cwd(), "/public/analog_template.xlsx")
         );
         break;
+      case "Excel_tool-sp_template":
+        await bot.sendDocument(
+          chatId,
+          path.join(process.cwd(), "/public/Tool_sp_template.xlsx")
+        );
+        break;
+      case "commitToolChanges-true":
+        answer = await createAnswerForCallback(text, cliId);
+        await bot.sendMessage(chatId, answer.text, answer.option);
+        break;
+      case "commitToolChanges-false":
+        answer = await createAnswerForCallback(text, cliId);
+
       default:
         try {
           const cbtext = text.split("%");
-          console.log(cbtext);
-
-          const answer = await createAnswerForCallback(cbtext[2] || cbtext[0]);
-          console.log(answer);
-          if (Array.isArray(answer)) {
-            if (answer[0].priznak === "spinfo" && cbtext[2] === undefined) {
-              await bot.sendMessage(chatId, answer[0].text);
-              if (answer[2].priznak === "analog") {
-                const analog_msg_id = await bot.sendMessage(chatId, "analog");
-                setTimeout(async () => {
-                  if (answer[2].option.length === 0) {
-                    return await bot.deleteMessage(
-                      analog_msg_id.chat.id,
-                      analog_msg_id.message_id
-                    );
-                  }
-                  await bot.editMessageText(answer[2].text, {
-                    chat_id: analog_msg_id.chat.id,
-                    message_id: analog_msg_id.message_id,
-                    reply_markup: {
-                      inline_keyboard: paginatemsg(
-                        answer[2].option,
-                        analog_msg_id.message_id,
-                        text,
-                        "analog"
-                      ),
-                    },
-                  });
-                }, 0);
-              }
-              if (answer[1].priznak === "tool") {
-                const tools_msg_id = await bot.sendMessage(chatId, "toolsBySP");
-                setTimeout(async () => {
-                  if (answer[1].option.length === 0) {
-                    return await bot.deleteMessage(
-                      tools_msg_id.chat.id,
-                      tools_msg_id.message_id
-                    );
-                  }
-                  await bot.editMessageText(answer[1].text, {
-                    chat_id: tools_msg_id.chat.id,
-                    message_id: tools_msg_id.message_id,
-                    reply_markup: {
-                      inline_keyboard: paginatemsg(
-                        answer[1].option,
-                        tools_msg_id.message_id,
-                        text,
-                        "toolsBySP"
-                      ),
-                    },
-                  });
-                }, 0);
-              }
-            } else {
-              let mas;
-              switch (cbtext[1]) {
-                case "toolsBySP":
-                  mas = answer[1];
-                  break;
-                case "analog":
-                  mas = answer[2];
-                  break;
-                case "toolsbyName":
-                  mas = answer[0];
-                  break;
-              }
-              await bot.editMessageText(mas.text, {
-                chat_id: chatId,
-                message_id: cbtext[0],
-                reply_markup: {
-                  inline_keyboard: paginatemsg(
-                    mas.option,
-                    cbtext[0],
-                    cbtext[2],
-                    cbtext[1],
-                    Number(cbtext[3])
-                  ),
-                },
-              });
-            }
-          } else {
-            await bot.sendMessage(
+          if (cbtext.length > 1) {
+            answer = await createAnswerForCallback(cbtext[2]);
+            await sendMsg(
+              answer,
               chatId,
-              answer.text.tool_name || answer.text,
-              answer.option
+              cbtext[2],
+              Number(cbtext[3]),
+              Number(cbtext[0]),
+              cbtext[1]
             );
-            if (answer.text.tool_path) {
-              await bot.sendDocument(
-                chatId,
-                path.join(process.cwd(), answer.text.tool_path)
-              );
-            }
+          } else {
+            answer = await createAnswerForCallback(cbtext[0]);
+            await sendMsg(answer, chatId, cbtext[0]);
           }
         } catch (error) {
           await bot.sendMessage(

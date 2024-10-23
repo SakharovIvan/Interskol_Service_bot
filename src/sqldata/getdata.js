@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 import botoptions from "../botoptions.js";
 
 const getInfofromBd = async (climsg) => {
-  var answer = [];
+  let result = {};
   const toolinfo = async (tool) =>
     await ToolPaths.findAll({
       where: {
@@ -11,12 +11,29 @@ const getInfofromBd = async (climsg) => {
       },
     });
 
-  const toolinfoByname = async (tool) =>
-    await ToolPaths.findAll({
+  const toolinfoByname = async (tool) => {
+    const bread = ["-", ".", "/", "/", " "];
+    const res = tool.split(/(\.|-|\/|\/| )/);
+    const indexOfBread = res
+      .map((el) => {
+        if (bread.includes(el)) {
+          return res.indexOf(el);
+        }
+        return;
+      })
+      .filter((el) => el !== undefined);
+    const result = res
+      .filter((el) => !indexOfBread.includes(res.indexOf(el)))
+      .map((el) => el.toUpperCase())
+      .map((el) => {
+        return { tool_name: { [Op.like]: `%${el}%` } };
+      });
+    return await ToolPaths.findAll({
       where: {
-        tool_name: { [Op.like]: `%${tool}%` },
+        [Op.and]: result,
       },
     });
+  };
 
   const toolsByName = await toolinfoByname(climsg);
   const toolanswer = await toolinfo(climsg);
@@ -33,7 +50,7 @@ const getInfofromBd = async (climsg) => {
 ⚒️ Характеристика: ${char || "Нет информации"}\n
 💵 Цена: ${price || "Нет информации"} руб\n
 🏠 Склад: ${warehousestatus || "Нет информации"}`;
-    answer.push({ priznak: "spinfo", text, option: botoptions.defaultoption });
+    result.spinfoanswer = { text, option: botoptions.defaultoption };
     const toolsByspmas = await ToolSPmatNo.findAll({
       where: {
         [Op.or]: [{ spmatNo: climsg }],
@@ -72,21 +89,16 @@ const getInfofromBd = async (climsg) => {
     const analog_inline_keyboard = await Promise.all(
       analog_inline_keyboard_promise
     );
-
-    answer.push(
-      {
-        priznak: "tool",
-        text: "Вы можете выбрать инструмент",
-        option: tools_inline_keyboard,
-      },
-      {
-        priznak: "analog",
-        text: "Есть аналоги 🔁",
-        option: analog_inline_keyboard,
-      }
-    );
+    result.toolsForSP = {
+      text: "Вы можете выбрать инструмент",
+      option: tools_inline_keyboard,
+    };
+    result.analogSP = {
+      text: "Есть аналоги 🔁",
+      option: analog_inline_keyboard,
+    };
   } else if (toolanswer[0]) {
-    answer = {
+    result.toolinfoanswer = {
       text: toolanswer[0].dataValues,
       option: botoptions.defaultoption,
     };
@@ -110,21 +122,17 @@ const getInfofromBd = async (climsg) => {
     const toolsByName_inline_keyboard = await Promise.all(
       toolsByName_inline_keyboard_promise
     );
-    answer.push({
-      priznak: "toolsbyname",
+    result.toolsByName = {
       text: "Найдены инструменты по наименованию",
       option: toolsByName_inline_keyboard,
-    });
+    };
   } else {
-    answer = {
+    result.noImfo = {
       text: "Информации не найдено((",
       option: botoptions.defaultoption,
     };
   }
-
-  //{ text:tooldata[0].dataValues, option: botoptions.defaultoption };
-
-  return answer;
+  return result;
 };
 
 export { getInfofromBd };
