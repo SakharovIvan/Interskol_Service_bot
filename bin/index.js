@@ -110,7 +110,6 @@ const start = async () => {
     const username = msg.from.username;
     const time = msg.date;
     const doc = msg.document;
-
     try {
       await MessageLog.create({ cliId, text, chatId, username });
       switch (true) {
