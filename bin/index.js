@@ -10,80 +10,93 @@ import paginatemsg from "../src/utils/paginatemsg.js";
 import { MessageLog } from "../src/sqldata/models.js";
 
 const sendMsg = async (answer, chatId, text, page, msgid, bd) => {
-  if (answer.spinfoanswer && bd === undefined) {
-    await bot.sendMessage(
-      chatId,
-      answer.spinfoanswer.text,
-      answer.spinfoanswer.option
-    );
+  try {
+    if (answer.spinfoanswer && bd === undefined) {
+      await bot.sendMessage(chatId, answer.spinfoanswer.text);
+    }
+  } catch (error) {
+    console.log(1);
   }
-  if (answer.analogSP && (bd === undefined || bd === "analog")) {
-    const analog_msg_id =
-      page === undefined ? await bot.sendMessage(chatId, "analog") : {};
-    setTimeout(async () => {
-      if (answer.analogSP.option.length === 0) {
-        return await bot.deleteMessage(chatId, analog_msg_id.message_id);
-      }
-      await bot.editMessageText(answer.analogSP.text, {
-        chat_id: chatId,
-        message_id: analog_msg_id.message_id || msgid,
-        reply_markup: {
-          inline_keyboard: paginatemsg(
-            answer.analogSP.option,
-            analog_msg_id.message_id || msgid,
-            text,
-            "analog",
-            page
-          ),
-        },
-      });
-    }, 0);
+  try {
+    if (answer.analogSP && (bd === undefined || bd === "analog")) {
+      const analog_msg_id =
+        page === undefined ? await bot.sendMessage(chatId, "analog") : {};
+      setTimeout(async () => {
+        if (answer.analogSP.option.length === 0) {
+          return await bot.deleteMessage(chatId, analog_msg_id.message_id);
+        }
+        await bot.editMessageText(answer.analogSP.text, {
+          chat_id: chatId,
+          message_id: analog_msg_id.message_id || msgid,
+          reply_markup: {
+            inline_keyboard: paginatemsg(
+              answer.analogSP.option,
+              analog_msg_id.message_id || msgid,
+              text,
+              "analog",
+              page
+            ),
+          },
+        });
+      }, 0);
+    }
+  } catch (error) {
+    console.log(2);
   }
-  if (answer.toolsForSP && (bd === undefined || bd === "toolsBySP")) {
-    const tools_msg_id =
-      page === undefined ? await bot.sendMessage(chatId, "toolsBySP") : {};
+  try {
+    if (answer.toolsForSP && (bd === undefined || bd === "toolsBySP")) {
+      const tools_msg_id =
+        page === undefined ? await bot.sendMessage(chatId, "toolsBySP") : {};
 
-    setTimeout(async () => {
-      if (answer.toolsForSP.option.length === 0) {
-        return await bot.deleteMessage(chatId, tools_msg_id.message_id);
-      }
-      await bot.editMessageText(answer.toolsForSP.text, {
-        chat_id: chatId,
-        message_id: tools_msg_id.message_id || msgid,
-        reply_markup: {
-          inline_keyboard: paginatemsg(
-            answer.toolsForSP.option,
-            tools_msg_id.message_id || msgid,
-            text,
-            "toolsBySP",
-            page
-          ),
-        },
-      });
-    }, 0);
+      setTimeout(async () => {
+        if (answer.toolsForSP.option.length === 0) {
+          return await bot.deleteMessage(chatId, tools_msg_id.message_id);
+        }
+        await bot.editMessageText(answer.toolsForSP.text, {
+          chat_id: chatId,
+          message_id: tools_msg_id.message_id || msgid,
+          reply_markup: {
+            inline_keyboard: paginatemsg(
+              answer.toolsForSP.option,
+              tools_msg_id.message_id || msgid,
+              text,
+              "toolsBySP",
+              page
+            ),
+          },
+        });
+      }, 0);
+    }
+  } catch (error) {
+    console.log(3);
   }
-  if (answer.toolsByName && (bd === undefined || bd === "toolsbyName")) {
-    const toolsbyname_msg_id =
-      page === undefined ? await bot.sendMessage(chatId, "toolsbyName") : {};
-    setTimeout(async () => {
-      if (answer.toolsByName.option.length === 0) {
-        return await bot.deleteMessage(chatId, toolsbyname_msg_id.message_id);
-      }
-      await bot.editMessageText(answer.toolsByName.text, {
-        chat_id: chatId,
-        message_id: toolsbyname_msg_id.message_id || msgid,
-        reply_markup: {
-          inline_keyboard: paginatemsg(
-            answer.toolsByName.option,
-            toolsbyname_msg_id.message_id || msgid,
-            text,
-            "toolsbyName",
-            page
-          ),
-        },
-      });
-    }, 0);
+  try {
+    if (answer.toolsByName && (bd === undefined || bd === "toolsbyName")) {
+      const toolsbyname_msg_id =
+        page === undefined ? await bot.sendMessage(chatId, "toolsbyName") : {};
+      setTimeout(async () => {
+        if (answer.toolsByName.option.length === 0) {
+          return await bot.deleteMessage(chatId, toolsbyname_msg_id.message_id);
+        }
+        await bot.editMessageText(answer.toolsByName.text, {
+          chat_id: chatId,
+          message_id: toolsbyname_msg_id.message_id || msgid,
+          reply_markup: {
+            inline_keyboard: paginatemsg(
+              answer.toolsByName.option,
+              toolsbyname_msg_id.message_id || msgid,
+              text,
+              "toolsbyName",
+              page
+            ),
+          },
+        });
+      }, 0);
+    }
+  } catch (error) {
+    console.log(4);
   }
+
   if (answer.toolinfoanswer) {
     await bot.sendMessage(chatId, answer.toolinfoanswer.text.tool_name);
     if (answer.toolinfoanswer.text.tool_path) {
@@ -140,7 +153,11 @@ const start = async () => {
           try {
             await sendMsg(answer, chatId, text);
           } catch {
-            await bot.sendMessage(chatId, answer.text, answer.option);
+            await bot.sendMessage(
+              chatId,
+              JSON.stringify(answer.text),
+              answer.option
+            );
           }
           break;
       }
