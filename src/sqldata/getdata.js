@@ -48,7 +48,7 @@ const getInfofromBd = async (climsg) => {
       spinfo[0].dataValues;
     const text = `${spmatNo}\n${name}\n
 ⚒️ Характеристика: ${char || "Нет информации"}\n
-💵 Цена: ${price || "Нет информации"} руб\n
+💵 Рекомендованная цена: ${price || "Нет информации"} руб\n
 🏠 Склад: ${warehousestatus || "Нет информации"}`;
     result.spinfoanswer = { text, option: botoptions.defaultoption };
     const toolsByspmas = await ToolSPmatNo.findAll({
