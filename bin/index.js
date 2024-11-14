@@ -107,7 +107,9 @@ const sendMsg = async (answer, chatId, text, page, msgid, bd) => {
     }
   }
   if (answer.noImfo) {
+
     await bot.sendMessage(chatId, answer.noImfo.text, answer.noImfo.option);
+
   }
 };
 
@@ -118,13 +120,24 @@ const start = async () => {
 
   bot.on("message", async (msg) => {
     const cliId = msg.from.id;
-    const text = msg.text;
+    let text = msg.text;
     const chatId = msg.chat.id;
     const username = msg.from.username;
     const time = msg.date;
     const doc = msg.document;
+    const group = msg.chat.type === "supergroup" ? true : false;
+    if (group && !msg.entities) {
+      return;
+    } else {
+      if (group) {
+        text = text.split(" ")[1];
+      }
+    }
+
     try {
-      await MessageLog.create({ cliId, text, chatId, username });
+      if (!group) {
+        await MessageLog.create({ cliId, text, chatId, username });
+      }
       switch (true) {
         case text === "/start":
           const stream = fs.createReadStream(
@@ -151,7 +164,11 @@ const start = async () => {
           }
           const answer = await createAnswer(text, cliId, doc, thumbPath);
           try {
-            await sendMsg(answer, chatId, text);
+            await sendMsg(
+              answer,
+              chatId,
+              text
+            );
           } catch {
             await bot.sendMessage(
               chatId,
