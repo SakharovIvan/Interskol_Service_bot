@@ -135,17 +135,6 @@ const start = async () => {
         return;
       }
     }
-    //if (
-    //  group &&
-    //  !msg.entities &&
-    //  !text.split(" ")[0] === "@INTERSKOL_Service_Info_bot"
-    //) {
-    //  return;
-    //} else {
-    //  if (group) {
-    //    text = text.split(" ")[1];
-    //  }
-    //}
 
     try {
       if (!group) {
