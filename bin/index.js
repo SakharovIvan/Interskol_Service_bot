@@ -126,7 +126,8 @@ const start = async () => {
     const time = msg.date;
     const doc = msg.document;
     const group = msg.chat.type === "supergroup" ? true : false;
-    if (group && !msg.entities) {
+    
+    if (group && !msg.entities && !text.split(" ")[0]==='@INTERSKOL_Service_Info_bot') {
       return;
     } else {
       if (group) {
