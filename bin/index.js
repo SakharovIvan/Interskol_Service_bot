@@ -107,9 +107,7 @@ const sendMsg = async (answer, chatId, text, page, msgid, bd) => {
     }
   }
   if (answer.noImfo) {
-
     await bot.sendMessage(chatId, answer.noImfo.text, answer.noImfo.option);
-
   }
 };
 
@@ -126,8 +124,18 @@ const start = async () => {
     const time = msg.date;
     const doc = msg.document;
     const group = msg.chat.type === "supergroup" ? true : false;
-    
-    if (group && !msg.entities && !text.split(" ")[0]==='@INTERSKOL_Service_Info_bot') {
+    if (group) {
+      if (text.split(" ")[0] === "@INTERSKOL_Service_Info_bot") {
+        if(msg.entities){text = text.split(" ")[1];}else{return}
+      } else {
+        return;
+      }
+    }
+    if (
+      group &&
+      !msg.entities &&
+      !text.split(" ")[0] === "@INTERSKOL_Service_Info_bot"
+    ) {
       return;
     } else {
       if (group) {
@@ -165,11 +173,7 @@ const start = async () => {
           }
           const answer = await createAnswer(text, cliId, doc, thumbPath);
           try {
-            await sendMsg(
-              answer,
-              chatId,
-              text
-            );
+            await sendMsg(answer, chatId, text);
           } catch {
             await bot.sendMessage(
               chatId,
