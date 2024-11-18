@@ -126,22 +126,26 @@ const start = async () => {
     const group = msg.chat.type === "supergroup" ? true : false;
     if (group) {
       if (text.split(" ")[0] === "@INTERSKOL_Service_Info_bot") {
-        if(msg.entities){text = text.split(" ")[1];}else{return}
+        if (msg.entities) {
+          text = text.split(" ")[1];
+        } else {
+          return;
+        }
       } else {
         return;
       }
     }
-    if (
-      group &&
-      !msg.entities &&
-      !text.split(" ")[0] === "@INTERSKOL_Service_Info_bot"
-    ) {
-      return;
-    } else {
-      if (group) {
-        text = text.split(" ")[1];
-      }
-    }
+    //if (
+    //  group &&
+    //  !msg.entities &&
+    //  !text.split(" ")[0] === "@INTERSKOL_Service_Info_bot"
+    //) {
+    //  return;
+    //} else {
+    //  if (group) {
+    //    text = text.split(" ")[1];
+    //  }
+    //}
 
     try {
       if (!group) {
