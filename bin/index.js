@@ -130,7 +130,7 @@ const start = async () => {
     }
     if (group) {
       console.log(text)
-     console.log(text.split(""));
+     console.log(JSON.stringify(text).split(""));
       if (!text.split("").includes(" ")) {
         return;
       }
