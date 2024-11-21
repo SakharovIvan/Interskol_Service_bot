@@ -130,7 +130,7 @@ const start = async () => {
     }
     if (group) {
       console.log(text.split(""));
-      if (!text.split("").includes("")) {
+      if (!text.split("").includes(" ")) {
         return;
       }
       if (text.split(" ")[0] === "@INTERSKOL_Service_Info_bot") {
