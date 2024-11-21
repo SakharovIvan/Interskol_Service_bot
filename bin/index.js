@@ -129,8 +129,6 @@ const start = async () => {
       return;
     }
     if (group) {
-      console.log(text)
-     console.log(JSON.stringify(text)?.split(""));
       if (!text?.split("").includes(" ")) {
         return;
       }
