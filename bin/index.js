@@ -129,6 +129,7 @@ const start = async () => {
     )
     if(!text&& !doc){return}
     if (group) {
+      if(!text.split(" ")[0]){return}
       if (text.split(" ")[0] === "@INTERSKOL_Service_Info_bot") {
         if (msg.entities) {
           text = text.split(" ")[1];
