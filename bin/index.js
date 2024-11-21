@@ -125,10 +125,14 @@ const start = async () => {
     const doc = msg.document;
     const group = msg.chat.type === "supergroup" ? true : false;
 
-    if(!text&& !doc){return}
+    if (!text && !doc) {
+      return;
+    }
     if (group) {
-      console.log(text)
-      if(!text.split(" ")){return}
+      console.log(text);
+      if (!text.split("").includes("")) {
+        return;
+      }
       if (text.split(" ")[0] === "@INTERSKOL_Service_Info_bot") {
         if (msg.entities) {
           text = text.split(" ")[1];
