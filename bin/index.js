@@ -129,7 +129,7 @@ const start = async () => {
       return;
     }
     if (group) {
-      console.log(text);
+      console.log(text.split(""));
       if (!text.split("").includes("")) {
         return;
       }
