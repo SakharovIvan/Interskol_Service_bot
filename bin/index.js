@@ -173,7 +173,12 @@ const start = async () => {
           }
           const answer = await createAnswer(text, cliId, doc, thumbPath);
           try {
-            await sendMsg(answer, chatId, text);
+            if(doc){          await bot.sendMessage(
+              chatId,
+              answers.text,
+              answer.option
+            );}else{
+            await sendMsg(answer, chatId, text);}
           } catch {
             await bot.sendMessage(
               chatId,
