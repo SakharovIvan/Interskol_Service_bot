@@ -98,7 +98,11 @@ const sendMsg = async (answer, chatId, text, page, msgid, bd) => {
   }
 
   if (answer.toolinfoanswer) {
-    await bot.sendMessage(chatId, answer.toolinfoanswer.text.tool_name);
+    await bot.sendMessage(chatId, answer.toolinfoanswer.text.tool_name, {
+      reply_markup: {
+        inline_keyboard: answer.toolinfoanswer.option,
+      },
+    });
     if (answer.toolinfoanswer.text.tool_path) {
       const stream = fs.createReadStream(
         path.join(process.cwd(), answer.toolinfoanswer.text.tool_path)
@@ -173,18 +177,13 @@ const start = async () => {
           }
           const answer = await createAnswer(text, cliId, doc, thumbPath);
           try {
-            if(doc){          await bot.sendMessage(
-              chatId,
-              answers.text,
-              answer.option
-            );}else{
-            await sendMsg(answer, chatId, text);}
+            if (doc) {
+              await bot.sendMessage(chatId, answer.text, answer.option);
+            } else {
+              await sendMsg(answer, chatId, text);
+            }
           } catch {
-            await bot.sendMessage(
-              chatId,
-              JSON.stringify(answer.text),
-              answer.option
-            );
+            await bot.sendMessage(chatId, answer.text, answer.option);
           }
           break;
       }

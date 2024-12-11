@@ -7,7 +7,7 @@ const getInfofromBd = async (climsg) => {
   const toolinfo = async (tool) =>
     await ToolPaths.findAll({
       where: {
-        tool_code: Number(tool) || null,
+        tool_code: { [Op.like]: `${tool}%` || null },
       },
     });
 
@@ -61,7 +61,10 @@ const getInfofromBd = async (climsg) => {
       return toolinfo(tool_code).then((res) => {
         if (!res[0]) {
           return [
-            { text: `${tool_code} - нет схемы`, callback_data: tool_code },
+            {
+              text: `${tool_code} - нет схемы`,
+              callback_data: `${tool_code}`,
+            },
           ];
         }
         return [
@@ -98,9 +101,30 @@ const getInfofromBd = async (climsg) => {
       option: analog_inline_keyboard,
     };
   } else if (toolanswer[0]) {
+    const tools_modif_inline_keyboard_promise = toolanswer.map((el) => {
+      const { tool_code } = el.dataValues;
+      return toolinfo(tool_code).then((res) => {
+        if (!res[0]) {
+          return [
+            { text: `${tool_code} - нет схемы`, callback_data: `${tool_code}` },
+          ];
+        }
+        return [
+          {
+            text: res[0].dataValues.tool_name.slice(0, -4),
+            callback_data: tool_code,
+          },
+        ];
+      });
+    });
+
+    const tools_modif_inline_keyboard = await Promise.all(
+      tools_modif_inline_keyboard_promise
+    );
+
     result.toolinfoanswer = {
       text: toolanswer[0].dataValues,
-      option: botoptions.defaultoption,
+      option: tools_modif_inline_keyboard,
     };
   } else if (toolsByName[0]) {
     const toolsByName_inline_keyboard_promise = toolsByName.map(async (el) => {
@@ -134,5 +158,21 @@ const getInfofromBd = async (climsg) => {
   }
   return result;
 };
+
+class Search{
+  climsg
+  constructor(climsg){
+this.climsg=climsg
+  }
+  
+async toolinfo (){
+  await ToolPaths.findAll({
+    where: {
+      tool_code: { [Op.like]: `${tool}%` || null },
+    },
+  });
+}
+
+}
 
 export { getInfofromBd };

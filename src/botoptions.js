@@ -1,6 +1,5 @@
 export default {
   defaultoption: {
-    parse_mode: "Markdown",
     reply_markup: {
       resize_keyboard: true,
     },

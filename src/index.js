@@ -47,7 +47,7 @@ const createAnswer = async (text, cliId, doc, link = "") => {
         case "toolsp":
           try {
             answer = await updateToolSPmatNo(
-              cliStatus[cliId].data.tool_code,
+              cliStatus[cliId].data ? cliStatus[cliId].data.tool_code : null,
               cliStatus[cliId].exceldata
             );
             await deletefilefromTemp(cliStatus[cliId].filepath);

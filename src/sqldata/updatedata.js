@@ -1,6 +1,7 @@
 import botoptions from "../botoptions.js";
 import { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog } from "./models.js";
 import path from "path";
+import { Op } from "sequelize";
 
 const updateToolByCode = async (code, data, commit = false) => {
   const answer = ToolPaths.findOne({ where: { tool_code: code } })
@@ -27,7 +28,8 @@ const updateToolByCode = async (code, data, commit = false) => {
         };
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.log(error);
       return {
         text: `some problem with updateToolByCode`,
         option: botoptions.defaultoption,
@@ -38,14 +40,30 @@ const updateToolByCode = async (code, data, commit = false) => {
 };
 
 const updateToolSPmatNo = async (code, data) => {
+  const tool_code_to_destroy = [];
   const newdata = data.map((info) => {
+    if (!tool_code_to_destroy.includes(info.tool_code) && info.tool_code) {
+      tool_code_to_destroy.push(info.tool_code);
+    }
+    const tool_code = info.tool_code === undefined ? code : info.tool_code;
+    console.log(tool_code, code);
     return {
-      tool_code: code,
       ...info,
+      tool_code,
     };
   });
+  if (tool_code_to_destroy.length === 0) {
+    tool_code_to_destroy.push(code);
+  }
   try {
-    const answer = ToolSPmatNo.destroy({ where: { tool_code: code } })
+    console.log(newdata);
+    const delete_promise = tool_code_to_destroy.map((tool_code) => {
+      ToolSPmatNo.destroy({
+        where: { tool_code: { [Op.like]: String(tool_code) } },
+      });
+    });
+
+    const answer = Promise.all(delete_promise)
       .then(() => {
         ToolSPmatNo.bulkCreate(newdata);
       })
@@ -60,14 +78,17 @@ const updateToolSPmatNo = async (code, data) => {
         });
         return Promise.all(promises).then(() => {
           return {
-            text: `${code} updated`,
+            text: `${tool_code_to_destroy} updated`,
             option: botoptions.defaultoption,
           };
         });
       })
-      .catch(() => {
-        ToolSPmatNo.bulkCreate(newdata);
-        return { text: `${code} created`, option: botoptions.defaultoption };
+      .catch((err) => {
+        console.log(err);
+        return {
+          text: `${tool_code_to_destroy} created`,
+          option: botoptions.defaultoption,
+        };
       });
     return answer;
   } catch (error) {

@@ -14,7 +14,6 @@ const downloadfile = async (link, name, dir = "/public/temp/") => {
 
 const movefiletomaindir = async (filePath, newfilePath, deletemode = false) => {
   try {
-    console.log(filePath, newfilePath);
     const name = path.basename(filePath);
     fs.copyFile(
       path.join(__filename, filePath),

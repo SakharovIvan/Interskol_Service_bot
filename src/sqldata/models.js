@@ -15,7 +15,7 @@ ToolPaths.init(
       defaultValue: Sequelize.UUIDV4,
     },
     tool_code: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       unique: true,
     },
     tool_path: {
@@ -41,7 +41,7 @@ ToolSPmatNo.init(
       defaultValue: Sequelize.UUIDV4,
     },
     tool_code: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
     spmatNo: {
       type: DataTypes.STRING,
@@ -165,4 +165,4 @@ CliInfo.init(
   }
 );
 
-export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog, MessageLog,CliInfo};
+export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog, MessageLog, CliInfo };
