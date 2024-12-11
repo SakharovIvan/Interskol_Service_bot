@@ -8,14 +8,12 @@ import {
 } from "./models.js";
 
 try {
-
-    await ToolPaths.sync();
-    await ToolSPmatNo.sync();
-    await SPmatNo.sync();
-    await SPanalog.sync();
-    await MessageLog.sync();
-    await CliInfo.sync();
-
+  await ToolPaths.sync();
+  await ToolSPmatNo.sync({ alter: true });
+  await SPmatNo.sync({ alter: true });
+  await SPanalog.sync();
+  await MessageLog.sync();
+  await CliInfo.sync();
 
   console.log("Соединение с БД было успешно установлено");
 } catch (e) {
