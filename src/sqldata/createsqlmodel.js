@@ -8,7 +8,7 @@ import {
 } from "./models.js";
 
 try {
-  await ToolPaths.sync();
+  await ToolPaths.sync({ alter: true });
   await ToolSPmatNo.sync({ alter: true });
   await SPmatNo.sync({ alter: true });
   await SPanalog.sync();
