@@ -26,7 +26,7 @@ const fileparser = async (file) => {
         },
         filetype: "toolpdf",
       };
-    case fileextension === "xlsx" || "xlsm":
+    case fileextension === "xlsx" || fileextension === "xlsm":
       const filexlsx = reader.readFile(path.join(__filename, file));
       let data = [];
       const sheets = filexlsx.SheetNames;
