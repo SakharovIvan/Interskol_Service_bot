@@ -26,7 +26,7 @@ const fileparser = async (file) => {
         },
         filetype: "toolpdf",
       };
-    case fileextension === "xlsx":
+    case fileextension === "xlsx" || "xlsm":
       const filexlsx = reader.readFile(path.join(__filename, file));
       let data = [];
       const sheets = filexlsx.SheetNames;
@@ -50,7 +50,7 @@ const fileparser = async (file) => {
             tool_code,
             spmatNo,
             sppiccode,
-            spqty,
+            spqty: Number(spqty) || null,
             name,
             char,
             spmatNoanalog,
