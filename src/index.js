@@ -34,8 +34,8 @@ const createAnswer = async (text, cliId, doc, link = "") => {
         case "toolpdf":
           answer = await updateToolByCode(filepars.tool, filepars.data);
           if (
-            answer.text === `${filepars.tool} created` ||
-            answer.text === `${filepars.tool} updated`
+            answer.text === `${filepars.tool} created\nplease import excel` ||
+            answer.text === `${filepars.tool} updated\nplease import excel`
           ) {
             await movefiletomaindir(
               filepars.data.tool_path,
@@ -85,6 +85,7 @@ const createAnswerForCallback = async (text, cliId) => {
     switch (true) {
       case text === "commitToolChanges-true":
         const { tool, data } = status;
+        console.log(tool, data);
         answer = await updateToolByCode(tool, data, true);
         await movefiletomaindir(data.tool_path, "/public/toolPDF", true);
         return answer;

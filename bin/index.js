@@ -1,5 +1,5 @@
 import TelegramAPI from "node-telegram-bot-api";
-import { token } from "../src/config.js";
+import { token, SchemeServiceURL } from "../src/config.js";
 const bot = new TelegramAPI(token, { polling: true });
 import answers from "../public/answers.js";
 import { createAnswer, createAnswerForCallback } from "../src/index.js";
@@ -8,6 +8,12 @@ import fs from "fs";
 import botoptions from "../src/botoptions.js";
 import paginatemsg from "../src/utils/paginatemsg.js";
 import { MessageLog } from "../src/sqldata/models.js";
+import {
+  downloadfile,
+  deletefilefromTemp,
+} from "../src/utils/downloadfilefrombot.js";
+const __filename = process.cwd();
+const __dirname = path.dirname(__filename);
 
 const sendMsg = async (answer, chatId, text, page, msgid, bd) => {
   try {
@@ -104,20 +110,43 @@ const sendMsg = async (answer, chatId, text, page, msgid, bd) => {
       },
     });
     if (answer.toolinfoanswer.text.tool_path) {
-      const stream = fs.createReadStream(
-        path.join(process.cwd(), answer.toolinfoanswer.text.tool_path)
-      );
-      await bot.sendDocument(chatId, stream);
+      try {
+        const url =
+          SchemeServiceURL +
+          "/tool/download/pdf/" +
+          answer.toolinfoanswer.text.tool_code;
+        await downloadfile(url + ".pdf", answer.toolinfoanswer.text.tool_name);
+        await bot.sendDocument(
+          chatId,
+          __dirname +
+            "/Interskol_Service_bot/public/temp/" +
+            answer.toolinfoanswer.text.tool_name
+        );
+        setTimeout(async () => {
+          await deletefilefromTemp(
+            "/public/temp/" + answer.toolinfoanswer.text.tool_name
+          );
+        }, 0);
+      } catch (error) {
+        await bot.sendMessage(
+          chatId,
+          "Не удалось загрузить взрывсхему инструмента"
+        );
+      }
     }
   }
-  if (answer.noImfo) {
-    await bot.sendMessage(chatId, answer.noImfo.text, answer.noImfo.option);
+  if (answer.noInfo) {
+    await bot.sendMessage(chatId, answer.noInfo.text, answer.noInfo.option);
   }
 };
 
 const start = async () => {
   bot.setMyCommands([
     { command: "/start", description: "Начальное приветствие" },
+    {
+      command: "/map",
+      description: "Список авторизивоанных сервисных центров",
+    },
   ]);
 
   bot.on("message", async (msg) => {
@@ -160,6 +189,13 @@ const start = async () => {
           await bot.sendMessage(
             chatId,
             answers.textStart,
+            botoptions.defaultoption
+          );
+          break;
+        case text === "/map":
+          await bot.sendMessage(
+            chatId,
+            answers.textMap,
             botoptions.defaultoption
           );
           break;

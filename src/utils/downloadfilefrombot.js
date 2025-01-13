@@ -2,6 +2,7 @@ import fs from "fs";
 import axios from "axios";
 import path from "path";
 import { pipeline } from "node:stream/promises";
+import sentFile from "./sentfile.js";
 const __filename = process.cwd();
 const __dirname = path.dirname(__filename);
 
@@ -15,21 +16,24 @@ const downloadfile = async (link, name, dir = "/public/temp/") => {
 const movefiletomaindir = async (filePath, newfilePath, deletemode = false) => {
   try {
     const name = path.basename(filePath);
+
     fs.copyFile(
       path.join(__filename, filePath),
       path.join(__filename, newfilePath, name),
+
       (err) => {
         if (err) {
           console.log(err);
         }
-
-        console.log("File copied successfully");
       }
     );
 
-    if (deletemode) {
-      await deletefilefromTemp(filePath);
-    }
+    sentFile(filePath).then(async () => {
+      if (deletemode) {
+        await deletefilefromTemp(filePath);
+        console.log("file deleted");
+      }
+    });
   } catch (error) {
     console.log(error);
   }
@@ -47,5 +51,7 @@ const deletefilefromTemp = async (filePath) => {
     console.log(error);
   }
 };
+
+
 
 export { downloadfile, movefiletomaindir, deletefilefromTemp };

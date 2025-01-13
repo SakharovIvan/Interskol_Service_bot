@@ -2,7 +2,7 @@ import botoptions from "../botoptions.js";
 import { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog } from "./models.js";
 import path from "path";
 import { Op } from "sequelize";
-
+import SPmatNoDto from "../dtos/sparepartdto.js";
 const updateToolByCode = async (code, data, commit = false) => {
   const answer = ToolPaths.findOne({ where: { tool_code: code } })
     .then((obj) => {
@@ -21,7 +21,9 @@ const updateToolByCode = async (code, data, commit = false) => {
           option: botoptions.needcommitToolChanges,
         };
       } else {
-        ToolPaths.create(data);
+        const { tool_name } = data;
+        const tool_path = "/public/toolPDF/" + tool_name;
+        ToolPaths.create({ ...data, tool_path });
         return {
           text: `${code} created\nplease import excel`,
           option: botoptions.defaultoption,
@@ -40,57 +42,62 @@ const updateToolByCode = async (code, data, commit = false) => {
 };
 
 const updateToolSPmatNo = async (code, data) => {
-  const tool_code_to_destroy = [];
-  const newdata = data.map((info) => {
-    if (!tool_code_to_destroy.includes(info.tool_code) && info.tool_code) {
-      tool_code_to_destroy.push(info.tool_code);
-    }
-    const tool_code = info.tool_code === undefined ? code : info.tool_code;
-    console.log(tool_code, code);
-    return {
-      ...info,
-      tool_code,
-    };
-  });
-  if (tool_code_to_destroy.length === 0) {
-    tool_code_to_destroy.push(code);
-  }
   try {
-    console.log(newdata);
-    const delete_promise = tool_code_to_destroy.map((tool_code) => {
-      ToolSPmatNo.destroy({
-        where: { tool_code: { [Op.like]: String(tool_code) } },
-      });
-    });
+    const tool_code_to_destroy = [];
+    const newdata = data.map((info) => {
+      if (!tool_code_to_destroy.includes(info.tool_code) && info.tool_code) {
+        tool_code_to_destroy.push(info.tool_code);
+      }
+      const tool_code = info.tool_code === undefined ? code : info.tool_code;
+      return new SPmatNoDto(info, tool_code);
 
-    const answer = Promise.all(delete_promise)
-      .then(() => {
-        ToolSPmatNo.bulkCreate(newdata);
-      })
-      .then(() => {
-        const promises = newdata.map((el) => {
-          SPmatNo.findOne({ where: { spmatNo: el.spmatNo } }).then(
-            function (obj) {
-              if (obj) return obj.update(el);
-              return SPmatNo.create(el);
-            }
-          );
+    });
+    if (tool_code_to_destroy.length === 0) {
+      tool_code_to_destroy.push(code);
+    }
+    try {
+      const delete_promise = tool_code_to_destroy.map((tool_code) => {
+        ToolSPmatNo.destroy({
+          where: { tool_code: { [Op.like]: String(tool_code) } },
         });
-        return Promise.all(promises).then(() => {
+      });
+
+      const answer = Promise.all(delete_promise)
+        .then(() => {
+          ToolSPmatNo.bulkCreate(newdata);
+        })
+        .then(() => {
+          const promises = newdata.map((el) => {
+            SPmatNo.findOne({ where: { spmatNo: el.spmatNo } })
+              .then(function (obj) {
+                if (obj) return obj.update(el);
+                return SPmatNo.create(el);
+              })
+              .catch((err) => {
+                return {
+                  text: `${tool_code_to_destroy} ${JSON.stringify(err)} Error`,
+                  option: botoptions.defaultoption,
+                };
+              });
+          });
+          return Promise.all(promises).then(() => {
+            return {
+              text: `${tool_code_to_destroy} updated`,
+              option: botoptions.defaultoption,
+            };
+          });
+        })
+        .catch((err) => {
+          console.log(err);
           return {
-            text: `${tool_code_to_destroy} updated`,
+            text: `${tool_code_to_destroy} problem with update`,
             option: botoptions.defaultoption,
           };
         });
-      })
-      .catch((err) => {
-        console.log(err);
-        return {
-          text: `${tool_code_to_destroy} created`,
-          option: botoptions.defaultoption,
-        };
-      });
-    return answer;
+      return answer;
+    } catch (error) {
+      return { text: `${error}`, option: botoptions.defaultoption };
+    }
   } catch (error) {
     return { text: `${error}`, option: botoptions.defaultoption };
   }

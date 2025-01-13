@@ -2,10 +2,9 @@ import path from "path";
 import XLSX from "xlsx";
 import reader from "xlsx";
 import fs, { stat } from "fs";
-const toolcode_from_filename = (text) => {
+export const toolcode_from_filename = (text) => {
   const regexp = text.match(/\(.+?\)/g);
   const result = regexp.map((tx) => tx.slice(1, -1));
-  //.filter(reg=> !isNaN(Number(reg)))
 
   return result[0];
 };
