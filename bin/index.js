@@ -183,7 +183,7 @@ const start = async () => {
       switch (true) {
         case text === "/start":
           const stream = fs.createReadStream(
-            path.join(process.cwd(), "/public/images/INTERSOL_logo.jpg")
+            path.join(__filename, "/public/images/INTERSOL_logo.jpg")
           );
           await bot.sendPhoto(chatId, stream);
           await bot.sendMessage(

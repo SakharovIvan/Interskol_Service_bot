@@ -25,5 +25,6 @@ const emailConfig = {
     pass: "nP8ecQ51",
   },
 };
+const SchemeServiceURL = "http://77.105.172.224:3003";
 
-export { sequelize, token, adminID, emailConfig };
+export { sequelize, token, adminID, emailConfig, SchemeServiceURL };
