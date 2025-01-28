@@ -105,6 +105,9 @@ SPanalog.init(
     spmatNoanalog: {
       type: DataTypes.STRING,
     },
+    percentage: {
+      type: DataTypes.INTEGER,
+    },
   },
   {
     sequelize,

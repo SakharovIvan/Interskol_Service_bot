@@ -16,6 +16,7 @@ const xlsxpars = async (file) => {
       temp.forEach((res) => {
         const spmatNo = res["Артикул"];
         const spmatNoanalog = res["Аналог"];
+        const percentage=res["% Схождести"]
         const sppiccode = res["№ на схеме"];
         const spqty = res["Кол-во шт./изд."];
         const name = res["Наименование детали"];
@@ -32,6 +33,7 @@ const xlsxpars = async (file) => {
           tool_path,
           spmatNo,
           sppiccode,
+          percentage,
           spqty,
           name,
           char,

@@ -45,7 +45,7 @@ export default async function spInfoService(spmatNo) {
 
     const analogmas = await SPanalog.findAll({
       where: {
-        spmatNo: spmatNo,
+        [Op.and]:[{spmatNo: spmatNo},{percentage:100}],
       },
     });
 

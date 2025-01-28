@@ -44,6 +44,7 @@ const fileparser = async (file) => {
           const warehouseqty = res["Склад количество"];
           const warehousestatus = res["Комментарий по складу Запчасти"];
           const price = res["Оптовые ДСО с НДС"];
+          const percentage=res["% Схождести"]
 
           data.push({
             tool_code,
@@ -51,6 +52,7 @@ const fileparser = async (file) => {
             sppiccode,
             spqty: Number(spqty) || null,
             name,
+            percentage:Number(percentage) || null,
             char,
             spmatNoanalog,
             warehousestatus,
