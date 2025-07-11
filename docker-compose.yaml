@@ -1,0 +1,18 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    container_name: TG_DBs
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: fortest
+    ports:
+      - "24:24"
+
+  client:
+    build: /
+    command: npm start
+    network_mode: host
+    depends_on:
+      - db
