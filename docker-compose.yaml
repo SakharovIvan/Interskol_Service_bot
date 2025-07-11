@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: root
       POSTGRES_DB: tool_sp_info
     ports:
-      - "25:25"
+      - "24:24"
 
   client:
     build: .
