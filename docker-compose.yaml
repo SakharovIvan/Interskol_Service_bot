@@ -11,7 +11,7 @@ services:
       - "24:24"
 
   client:
-    build: /
+    build: .
     command: npm start
     network_mode: host
     depends_on:
