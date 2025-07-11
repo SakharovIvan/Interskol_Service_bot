@@ -2,13 +2,13 @@ version: "3"
 services:
   db:
     image: postgres
-    container_name: TG_DBs
+    container_name: TG_ASC_DB
     environment:
       POSTGRES_PASSWORD: root
       POSTGRES_USER: root
-      POSTGRES_DB: fortest
+      POSTGRES_DB: tool_sp_info
     ports:
-      - "24:24"
+      - "25:25"
 
   client:
     build: .
