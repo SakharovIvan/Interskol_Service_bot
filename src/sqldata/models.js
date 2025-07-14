@@ -60,61 +60,6 @@ ToolSPmatNo.init(
   }
 );
 
-SPmatNo.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      defaultValue: Sequelize.UUIDV4,
-    },
-    spmatNo: {
-      type: DataTypes.STRING,
-    },
-    name: {
-      type: DataTypes.STRING,
-    },
-    char: {
-      type: DataTypes.STRING,
-    },
-    price: {
-      type: DataTypes.DECIMAL,
-    },
-    warehousestatus: {
-      type: DataTypes.STRING,
-    },
-    warehouseqty: {
-      type: DataTypes.INTEGER,
-    },
-    c1name: {
-      type: DataTypes.STRING,
-    },
-  },
-  { sequelize, createdAt: false, updatedAt: "updateTimestamp" }
-);
-
-SPanalog.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      defaultValue: Sequelize.UUIDV4,
-    },
-    spmatNo: {
-      type: DataTypes.STRING,
-    },
-    spmatNoanalog: {
-      type: DataTypes.STRING,
-    },
-    percentage: {
-      type: DataTypes.INTEGER,
-    },
-  },
-  {
-    sequelize,
-    createdAt: false,
-    updatedAt: "updateTimestamp",
-  }
-);
 
 MessageLog.init(
   {
@@ -142,30 +87,30 @@ MessageLog.init(
   }
 );
 
-CliInfo.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      defaultValue: Sequelize.UUIDV4,
-    },
-    cliId: {
-      type: DataTypes.STRING,
-    },
-    email: {
-      type: DataTypes.STRING,
-    },
-    addres: {
-      type: DataTypes.STRING,
-    },
-    cli_name: {
-      type: DataTypes.STRING,
-    },
-  },
-  {
-    sequelize,
-    createdAt: true,
-  }
-);
+//CliInfo.init(
+//  {
+//    id: {
+//      type: DataTypes.UUID,
+//      primaryKey: true,
+//      defaultValue: Sequelize.UUIDV4,
+//    },
+//    cliId: {
+//      type: DataTypes.STRING,
+//    },
+//    email: {
+//      type: DataTypes.STRING,
+//    },
+//    addres: {
+//      type: DataTypes.STRING,
+//    },
+//    cli_name: {
+//      type: DataTypes.STRING,
+//    },
+//  },
+//  {
+//    sequelize,
+//    createdAt: true,
+//  }
+//);
 
-export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog, MessageLog, CliInfo };
+export { ToolPaths, ToolSPmatNo, SPmatNo, SPanalog, MessageLog };

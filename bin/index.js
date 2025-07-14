@@ -145,7 +145,7 @@ const start = async () => {
     { command: "/start", description: "Начальное приветствие" },
     {
       command: "/map",
-      description: "Список авторизивоанных сервисных центров",
+      description: "Список авторизивоанных сервисных центров ",
     },
   ]);
 

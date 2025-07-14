@@ -1,18 +1,17 @@
-import { SPmatNo, SPanalog, ToolSPmatNo } from "../models.js";
+import { ToolSPmatNo } from "../models.js";
 import { Op } from "sequelize";
 import botoptions from "../../botoptions.js";
 import toolService from "./toolService.js";
-
+import { SP_ServiceURL } from "../../config.js";
 export default async function spInfoService(spmatNo) {
   let result = {};
-  const spinfo = await SPmatNo.findAll({
-    where: {
-      [Op.or]: [{ spmatNo: spmatNo }],
-    },
+  const sp_search = await fetch(SP_ServiceURL + "/" + spmatNo, {
+    method: "GET",
   });
-  if (spinfo[0]) {
-    const { name, char, price, warehousestatus, spmatNo } =
-      spinfo[0].dataValues;
+  const spinfo = await sp_search.json();
+  console.log(spinfo);
+  if (spinfo) {
+    const { name, char, price, warehousestatus, spmatNo } = spinfo;
     const text = `${spmatNo}\n${name}\n
 ⚒️ Характеристика: ${char || "Нет информации"}\n
 💵 Рекомендованная цена: ${price || "Нет информации"} руб\n
@@ -43,11 +42,10 @@ export default async function spInfoService(spmatNo) {
       });
     });
 
-    const analogmas = await SPanalog.findAll({
-      where: {
-        [Op.and]:[{spmatNo: spmatNo},{percentage:100}],
-      },
+    const analogmas_ = await fetch(SP_ServiceURL + "/analog/" + spmatNo, {
+      method: "GET",
     });
+    const analogmas = await analogmas_.json();
 
     const analog_inline_keyboard_promise = analogmas.map((el) => {
       return [{ text: el.spmatNoanalog, callback_data: el.spmatNoanalog }];
@@ -67,11 +65,11 @@ export default async function spInfoService(spmatNo) {
       text: "Есть аналоги 🔁",
       option: analog_inline_keyboard,
     };
-  }else{
-    result.noInfo={
-              text: "Информации по ЗЧ не найдено((",
-              option: botoptions.defaultoption,
-    }
+  } else {
+    result.noInfo = {
+      text: "Информации по ЗЧ не найдено((",
+      option: botoptions.defaultoption,
+    };
   }
   return result;
 }

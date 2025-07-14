@@ -50,7 +50,6 @@ const updateToolSPmatNo = async (code, data) => {
       }
       const tool_code = info.tool_code === undefined ? code : info.tool_code;
       return new SPmatNoDto(info, tool_code);
-
     });
     if (tool_code_to_destroy.length === 0) {
       tool_code_to_destroy.push(code);
@@ -105,21 +104,27 @@ const updateToolSPmatNo = async (code, data) => {
 
 const updatewarehouse = async (data) => {
   try {
-    const promises = data.map((el) => {
-      SPmatNo.findOne({ where: { spmatNo: el.spmatNo.toString() } }).then(
-        function (obj) {
-          if (obj) return obj.update(el);
-          return SPmatNo.create(el);
-        }
-      );
+    const res = await fetch("localhost:3000/spareparts", {
+      method: "POST",
+      body: JSON.stringify(data),
     });
-    return Promise.all(promises).then(() => {
+    if (res.status === 200) {
+      console.log("sucess updated");
       return {
         text: `Warehouse updated`,
         option: botoptions.defaultoption,
       };
-    });
+    } else {
+      console.log(res);
+      return {
+        text: JSON.stringify(res),
+        option: botoptions.defaultoption,
+      };
+    }
   } catch (error) {
+    console.log(error);
+    console.log(data);
+
     return {
       text: `Some problem with warehouse update`,
       option: botoptions.defaultoption,

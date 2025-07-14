@@ -16,7 +16,7 @@ const xlsxpars = async (file) => {
       temp.forEach((res) => {
         const spmatNo = res["Артикул"];
         const spmatNoanalog = res["Аналог"];
-        const percentage=res["% Схождести"]
+        const percentage = res["% Схождести"];
         const sppiccode = res["№ на схеме"];
         const spqty = res["Кол-во шт./изд."];
         const name = res["Наименование детали"];
@@ -63,8 +63,13 @@ const updateBDdata = async (dir, type) => {
         await ToolPaths.bulkCreate(xlsxdata);
         break;
       case "SPmatNo":
-        await SPmatNo.destroy({ where: {}, truncate: true });
-        await SPmatNo.bulkCreate(xlsxdata);
+        const res=await fetch("localhost:3000/spareparts", {
+          method: "POST",
+          body: JSON.stringify(xlsxdata),
+        });
+        if(res.status===200){console.log('sucess updated')}else{
+        console.log(res)
+        }
         break;
       default:
         throw new Error(`Some problem with format ${type}!`);

@@ -72,7 +72,6 @@ const fileparser = async (file) => {
         default:
           filetype = "toolsp";
       }
-
       return { exceldata: data, filetype, filepath: file };
   }
 };
