@@ -8,13 +8,11 @@ const getInfofromBd = async (climsg) => {
   let toolanswer;
   let spinfo;
   let result;
-
   toolsByName = await toolService.toolSearchAnswer(climsg);
   toolanswer = await toolService.toolAnswer(climsg);
   spinfo = await spInfoService(climsg);
   const tool = toolanswer.noInfo ? toolsByName : toolanswer;
   result = { ...tool, ...spinfo };
-
   if (toolsByName.noInfo && toolanswer.noInfo && spinfo.noInfo) {
     return {
       noInfo: {
