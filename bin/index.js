@@ -12,6 +12,7 @@ import {
   downloadfile,
   deletefilefromTemp,
 } from "../src/utils/downloadfilefrombot.js";
+import { Answer } from "../src/models/answer.js";
 const __filename = process.cwd();
 const __dirname = path.dirname(__filename);
 
@@ -154,7 +155,6 @@ const start = async () => {
     let text = msg.text;
     const chatId = msg.chat.id;
     const username = msg.from.username;
-    const time = msg.date;
     const doc = msg.document;
     const group = msg.chat.type === "supergroup" ? true : false;
 
@@ -207,20 +207,13 @@ const start = async () => {
           );
           break;
         default:
-          let thumbPath;
-          if (msg.document !== undefined) {
-            thumbPath = await bot.getFileLink(msg.document.file_id);
-          }
-          const answer = await createAnswer(text, cliId, doc, thumbPath);
-          try {
-            if (doc) {
-              await bot.sendMessage(chatId, answer.text, answer.option);
-            } else {
-              await sendMsg(answer, chatId, text);
-            }
-          } catch {
-            await bot.sendMessage(chatId, answer.text, answer.option);
-          }
+          const answer = new Answer({ msg: text, cb: false, chatId, username });
+          await answer.init();
+          await bot.sendMessage(
+            answer.chatId,
+            answer.sp_view.text,
+            answer.sp_view.option
+          );
           break;
       }
     } catch (err) {

@@ -25,6 +25,7 @@ const emailConfig = {
     pass: "nP8ecQ51",
   },
 };
-const SchemeServiceURL = "http://77.105.172.224:3003";
 
-export { sequelize, token, adminID, emailConfig, SchemeServiceURL };
+const SchemeServiceURL = "https://interskol-b2b-test.ru/toolservice";
+const SP_ServiceURL = "https://interskol-b2b-test.ru/api/spareparts";
+export { sequelize, token, adminID, emailConfig, SchemeServiceURL,SP_ServiceURL };

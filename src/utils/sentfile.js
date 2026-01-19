@@ -8,7 +8,7 @@ import FormData from "form-data";
 const __filename = process.cwd();
 export default async function sentFile(pathToFile) {
   const readfile = fs.readFileSync(__filename + pathToFile);
-
+  
   let form = new FormData();
   form.append("pdf", readfile);
   form.append("name", "whatever");
