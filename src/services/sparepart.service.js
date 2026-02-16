@@ -1,7 +1,7 @@
 import { SP_ServiceURL } from "../config.js";
 
 class SparepartService {
-  init() {}
+  init() { }
   async spSearch(spmatNo, limit) {
     const sp_search = await fetch(
       SP_ServiceURL + "?search=" + spmatNo + "&limit=" + limit,
@@ -10,12 +10,13 @@ class SparepartService {
       }
     );
     const spinfo = await sp_search.json();
-    if(spinfo.length===1){
-      const analog = await this.analog(spinfo.spmatNo)
-      return {...spinfo[0],analog,tools}
+    if (spinfo.length === 1) {
+      const analog = await this.analog(spmatNo)
+      return { ...spinfo[0], analog, length: 0 }
     }
     return spinfo;
   }
+
   async analog(spmatNo) {
     const sp_search = await fetch(SP_ServiceURL + "/analog/" + spmatNo, {
       method: "GET",

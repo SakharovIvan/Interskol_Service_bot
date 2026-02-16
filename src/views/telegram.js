@@ -4,17 +4,25 @@ class TG_View {
   sp_msg_list(data) {
 
   }
+
   sp_msg(sp_data) {
     const text = `${sp_data.spmatNo}\n${sp_data.name}\n
 ⚒️ Характеристика: ${sp_data.char || "Нет информации"}\n
 💵 Рекомендованная цена: ${sp_data.price || "Нет информации"} руб\n
 🏠 Склад: ${SP_warehouse_status_view[sp_data.warehouseqty] || "Нет информации"}`;
-    return {text,option:botoptions.defaultoption,analog};
+    return { text, option: botoptions.defaultoption };
   }
-  analog({analog,msgId,page}){
 
+  analog(analog_List, limit = 1, offset = 7) {
+    const option = analog_List.map((el) => {
+      return [{ text: el.spmatNoanalog + ' ' + el.percentage + '%', callback_data: el.spmatNoanalog + '%' }]
+    }).slice(limit - 1, offset)
+    return {
+      text: "Есть аналоги 🔁",
+      inline_keyboard: option
+    }
   }
-  
+
   #paginate(massive, msgId, climsg, bd, page = 0) {
     const len = massive.length;
     if (len <= 5) {
@@ -30,8 +38,8 @@ class TG_View {
     maspage.push(strelki);
     return maspage;
   }
-  tool_msg(){
+  tool_msg() {
 
   }
 }
-export const  Tg_view =new TG_View 
+export const Tg_view = new TG_View 

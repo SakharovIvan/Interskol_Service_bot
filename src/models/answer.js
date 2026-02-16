@@ -6,7 +6,7 @@ export class Answer {
     this.msg = data.msg;
     this.cb = data.cb;
     this.chatId = data.chatId;
-    this.msgId=data.msgId
+    this.msgId = data.msgId
     this.username = data.username;
     this.limit = 7;
     this.offset = 0;
@@ -22,24 +22,33 @@ export class Answer {
       await this.#cb_search();
     } else {
       await this.#msg_search();
-      this.#sp_view()
     }
+    this.sp_view()
+
   }
   async #msg_search() {
     const sp_data = await sp_service.spSearch(this.msg, this.limit);
     this.sp_data = sp_data;
   }
-  async #cb_search() {}
+  async #cb_search() {
+    const parse = this.msg.split("%")
+    this.msg = parse[0]
+    this.limit = parse[1]
+    this.offset = parse[2]
+    await this.#msg_search();
 
-  #sp_view() {
-    if (!this.sp_data.length) {
-      this.sp_view= Tg_view.sp_msg(this.sp_data);
-    }else{
-    this.sp_view= Tg_view.sp_msg_list(this.sp_data)}
-    if(this.sp_data.analog){
-        console.log()
-        this.analog_view = Tg_view.analog({analog:this.sp_data.analog,msgId:this.msgId,page:this.offset})
+  }
+
+  sp_view(limit = 1, offset = 7) {
+    if (this.sp_data.length === 0) {
+      this.sp_view = Tg_view.sp_msg(this.sp_data);
+    } else {
+      this.sp_view = Tg_view.sp_msg_list(this.sp_data)
+    }
+    if (this.sp_data.analog && this.sp_data.analog.length !== 0) {
+      this.analog_view = Tg_view.analog(this.sp_data.analog, limit, offset)
     }
   }
-  tool_view() {}
+
+  tool_view() { }
 }
